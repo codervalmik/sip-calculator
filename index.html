@@ -110,6 +110,11 @@
         .disclaimer { font-size: 10px; color: #64748b; text-align: justify; margin-top: 20px; border-top: 1px solid #e2e8f0; padding-top: 10px; line-height: 1.5; }
 
         @media print {
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
             body { background: white; padding: 0; }
             .container { box-shadow: none; border: none; max-width: 100%; }
             .tabs, .btn-pdf { display: none !important; }
@@ -369,10 +374,13 @@
 
     <!-- Regulatory Disclaimer -->
     <div class="disclaimer">
-        Past performance may or may not be sustained in future and is not a guarantee of any future returns.<br>
-        Please note that these calculators are for illustrations only and do not represent actual returns.<br>
-        Mutual Funds do not have a fixed rate of return and it is not possible to predict the rate of return.<br>
-        Mutual Fund Investments are subject to market risks, read all scheme related documents carefully.
+        <strong>Disclaimer:</strong>
+        <ol style="margin: 6px 0 0 18px; padding: 0;">
+            <li>Past performance may or may not be sustained in future and is not a guarantee of any future returns.</li>
+            <li>Please note that these calculators are for illustrations only and do not represent actual returns.</li>
+            <li>Mutual Funds do not have a fixed rate of return and it is not possible to predict the rate of return.</li>
+            <li>Mutual Fund Investments are subject to market risks, read all scheme related documents carefully.</li>
+        </ol>
     </div>
 </div>
 
