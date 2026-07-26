@@ -3,70 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIP TopUp Calculator - Arthsarthi</title>
+    <title>SIP Calculators - Valmik Dagu Ugale</title>
     <link rel="manifest" href="manifest.json">
     <style>
         :root {
-            --primary: #0d6efd;
-            --secondary: #198754;
-            --bg: #f4f6f9;
-            --card-bg: #ffffff;
-            --text: #212529;
+            --primary: #1e3a8a;
+            --secondary: #0d9488;
+            --accent: #d97706;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #0f172a;
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
         body { background-color: var(--bg); color: var(--text); padding: 15px; }
-        .container { max-width: 1100px; margin: 0 auto; background: var(--card-bg); border-radius: 12px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        .container { max-width: 900px; margin: 0 auto; background: var(--card); border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
 
         /* Branding Header */
-        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--primary); padding-bottom: 12px; margin-bottom: 20px; }
-        .brand-title { font-size: 22px; color: var(--primary); font-weight: bold; }
-        .brand-sub { font-size: 13px; color: #555; font-weight: 600; }
-        .contact-details { text-align: right; font-size: 12px; color: #444; }
+        .brand-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--primary); padding-bottom: 12px; margin-bottom: 15px; }
+        .brand-left h1 { font-size: 20px; color: var(--primary); }
+        .brand-left p { font-size: 13px; color: #475569; font-weight: 600; margin-top: 2px; }
+        .brand-right { text-align: right; font-size: 12px; color: #334155; }
 
-        /* Main Grid Layout */
-        .calculator-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
-        @media (max-width: 768px) { .calculator-grid { grid-template-columns: 1fr; } }
+        /* Client Details Bar */
+        .client-bar { display: flex; gap: 15px; background: #f1f5f9; padding: 10px 15px; border-radius: 8px; margin-bottom: 20px; }
+        .client-bar .field { flex: 1; }
+        .client-bar label { font-size: 12px; font-weight: bold; color: #475569; display: block; margin-bottom: 4px; }
+        .client-bar input { width: 100%; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 13px; font-weight: 600; }
 
-        /* Input Controls & Sliders */
-        .input-card { background: #fafafa; padding: 18px; border-radius: 10px; border: 1px solid #eee; }
-        .input-group { margin-bottom: 18px; }
-        .label-row { display: flex; justify-content: space-between; font-size: 13px; font-weight: bold; margin-bottom: 6px; }
-        .slider { width: 100%; height: 6px; background: #ddd; border-radius: 5px; outline: none; }
-        .num-input { width: 90px; text-align: right; padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; font-weight: bold; }
+        /* Navigation Tabs */
+        .tabs { display: flex; gap: 6px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
+        .tab-btn { flex: 1; min-width: 140px; padding: 10px; border: none; background: #e2e8f0; color: #334155; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; text-align: center; }
+        .tab-btn.active { background: var(--primary); color: white; }
 
-        /* Results & Chart */
-        .results-card { display: flex; flex-direction: column; gap: 15px; }
-        .chart-box { display: flex; justify-content: center; align-items: center; height: 180px; position: relative; }
-        .donut-chart { width: 150px; height: 150px; border-radius: 50%; background: conic-gradient(#ffc107 0% 40%, #0d6efd 40% 100%); display: flex; align-items: center; justify-content: center; }
-        .donut-inner { width: 90px; height: 90px; background: white; border-radius: 50%; }
-        .chart-legend { display: flex; justify-content: center; gap: 15px; font-size: 12px; margin-top: 10px; font-weight: 600; }
-        .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+        /* Forms Layout */
+        .calc-form { display: none; }
+        .calc-form.active { display: block; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } .brand-header { flex-direction: column; text-align: center; gap: 10px; } .brand-right { text-align: center; } }
+        
+        .input-group { margin-bottom: 10px; }
+        .input-group label { font-size: 12px; font-weight: bold; color: #334155; display: block; margin-bottom: 4px; }
+        .input-group input, .input-group select { width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; }
+        
+        .radio-group { display: flex; gap: 15px; margin-top: 5px; font-size: 12px; font-weight: bold; }
+        .radio-group label { display: flex; align-items: center; gap: 4px; cursor: pointer; }
 
-        /* Result Boxes */
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .stat-box { padding: 12px; border-radius: 8px; text-align: center; }
-        .bg-yellow { background: #fff8e1; border: 1px solid #ffe082; }
-        .bg-blue { background: #e3f2fd; border: 1px solid #90caf9; }
-        .stat-title { font-size: 11px; color: #666; font-weight: bold; }
-        .stat-val { font-size: 15px; font-weight: bold; margin-top: 4px; }
+        /* Results & Comparison Section */
+        .result-box { background: #fafafa; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; margin-top: 15px; }
+        .comparison-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px; }
+        @media (max-width: 600px) { .comparison-grid { grid-template-columns: 1fr; } }
+        
+        .card { padding: 12px; border-radius: 8px; border-left: 4px solid var(--primary); background: #f8fafc; }
+        .card.stepup { border-left-color: var(--secondary); background: #f0fdf4; }
+        .card-title { font-size: 13px; font-weight: bold; margin-bottom: 8px; color: #1e293b; }
+        .row { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px; }
+        .row.total { font-weight: bold; font-size: 13px; color: var(--primary); border-top: 1px dashed #cbd5e1; padding-top: 6px; }
+        .row.total.stepup { color: var(--secondary); }
 
-        /* Breakdown Table */
-        .table-container { margin-top: 25px; overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: right; }
-        th, td { padding: 8px 10px; border-bottom: 1px solid #eee; }
-        th { background: #fff3e0; color: #d84315; font-weight: bold; }
-        td:first-child, th:first-child { text-align: left; }
+        .diff-box { background: #fffbe0; border: 1px solid #fef08a; padding: 10px; border-radius: 6px; margin-top: 12px; font-size: 12px; font-weight: bold; color: #854d0e; text-align: center; }
 
-        /* Action Buttons & Footer */
+        /* Action Button */
         .btn-pdf { width: 100%; background: var(--secondary); color: white; border: none; padding: 12px; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 15px; }
-        .disclaimer { font-size: 10px; color: #888; text-align: center; margin-top: 15px; border-top: 1px solid #eee; padding-top: 10px; }
 
-        /* Print Style for Single-Click PDF */
+        /* Disclaimer */
+        .disclaimer { font-size: 10px; color: #64748b; text-align: justify; margin-top: 20px; border-top: 1px solid #e2e8f0; padding-top: 10px; line-height: 1.4; }
+
+        /* Print Styling for PDF */
         @media print {
             body { background: white; padding: 0; }
-            .container { box-shadow: none; border: none; width: 100%; max-width: 100%; }
-            .btn-pdf, .slider { display: none !important; }
-            .num-input { border: none; background: transparent; text-align: right; }
+            .container { box-shadow: none; border: none; max-width: 100%; }
+            .tabs, .btn-pdf { display: none !important; }
+            .calc-form.active { display: block !important; }
+            input, select { border: none !important; background: transparent !important; font-weight: bold; }
         }
     </style>
 </head>
@@ -74,170 +82,343 @@
 
 <div class="container">
     <!-- Header / Branding -->
-    <div class="header">
-        <div>
-            <div class="brand-title">Arthsarthi / Samish Financial Services</div>
-            <div class="brand-sub">Valmik Dagu Ugale | Mutual Fund & SIF Distributor</div>
-            <div style="font-size: 11px; color: #0d6efd; font-weight: bold;">ARN Code: ARN-142382</div>
+    <div class="brand-header">
+        <div class="brand-left">
+            <h1>Valmik Dagu Ugale | ARN-142382</h1>
+            <p>AMFI Registered Mutual Fund Distributor & SIF Distributor</p>
         </div>
-        <div class="contact-details">
+        <div class="brand-right">
             <div><strong>संपर्क:</strong> 8087126804</div>
             <div><strong>ईमेल:</strong> valmikugale@gmail.com</div>
-            <div>नाशिक, महाराष्ट्र - 423106</div>
+            <div>नाशिक, महाराष्ट्र - 422003</div>
         </div>
     </div>
 
-    <h3 style="margin-bottom: 15px; color: #333; font-size: 16px;">Mutual Fund SIP TopUp Calculator</h3>
+    <!-- Client Info Bar -->
+    <div class="client-bar">
+        <div class="field">
+            <label>क्लायंटचे नाव (Client Name):</label>
+            <input type="text" id="clientName" placeholder="उदा. राहुल शर्मा">
+        </div>
+        <div class="field" style="max-width: 150px;">
+            <label>तारीख (Date):</label>
+            <input type="text" id="reportDate" readonly>
+        </div>
+    </div>
 
-    <!-- Calculator Main Layout -->
-    <div class="calculator-grid">
-        <!-- Inputs Section -->
-        <div class="input-card">
+    <!-- Navigation Tabs -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab(event, 'calc1')">1. Normal SIP</button>
+        <button class="tab-btn" onclick="switchTab(event, 'calc2')">2. Step-Up vs Normal</button>
+        <button class="tab-btn" onclick="switchTab(event, 'calc3')">3. SIP + Inflation</button>
+        <button class="tab-btn" onclick="switchTab(event, 'calc4')">4. Step-Up + Inflation</button>
+    </div>
+
+    <!-- CALC 1: Normal SIP -->
+    <div id="calc1" class="calc-form active">
+        <div class="form-grid">
             <div class="input-group">
-                <div class="label-row">
-                    <span>मासिक SIP रक्कम (₹)</span>
-                    <input type="number" id="monthlySIP" class="num-input" value="25000" oninput="syncInputs('monthlySIP', 'monthlySIPSlider'); calculate();">
-                </div>
-                <input type="range" id="monthlySIPSlider" class="slider" min="1000" max="100000" step="1000" value="25000" oninput="syncInputs('monthlySIPSlider', 'monthlySIP'); calculate();">
+                <label>मासिक SIP रक्कम (₹):</label>
+                <input type="number" id="c1_p" value="5000" oninput="runCalc1()">
             </div>
-
             <div class="input-group">
-                <div class="label-row">
-                    <span>कालावधी (वर्षे)</span>
-                    <input type="number" id="years" class="num-input" value="25" oninput="syncInputs('years', 'yearsSlider'); calculate();">
-                </div>
-                <input type="range" id="yearsSlider" class="slider" min="1" max="40" value="25" oninput="syncInputs('yearsSlider', 'years'); calculate();">
+                <label>अपेक्षित परतावा दर (% प्रति वर्ष):</label>
+                <input type="number" id="c1_r" value="12" step="0.5" oninput="runCalc1()">
             </div>
-
             <div class="input-group">
-                <div class="label-row">
-                    <span>अपेक्षित परतावा दर (% प्रति वर्ष)</span>
-                    <input type="number" id="returnRate" class="num-input" value="12" step="0.5" oninput="syncInputs('returnRate', 'returnRateSlider'); calculate();">
-                </div>
-                <input type="range" id="returnRateSlider" class="slider" min="1" max="25" step="0.5" value="12" oninput="syncInputs('returnRateSlider', 'returnRate'); calculate();">
-            </div>
-
-            <div class="input-group">
-                <div class="label-row">
-                    <span>वार्षिक Step-Up (%)</span>
-                    <input type="number" id="stepUp" class="num-input" value="10" step="0.5" oninput="syncInputs('stepUp', 'stepUpSlider'); calculate();">
-                </div>
-                <input type="range" id="stepUpSlider" class="slider" min="0" max="30" step="0.5" value="10" oninput="syncInputs('stepUpSlider', 'stepUp'); calculate();">
+                <label>कालावधी (वर्षे):</label>
+                <input type="number" id="c1_n" value="15" oninput="runCalc1()">
             </div>
         </div>
-
-        <!-- Results & Chart Section -->
-        <div class="results-card">
-            <div class="chart-box">
-                <div class="donut-chart" id="chartDonut">
-                    <div class="donut-inner"></div>
-                </div>
-            </div>
-            <div class="chart-legend">
-                <span><span class="dot" style="background: #ffc107;"></span>एकूण गुंतवणूक</span>
-                <span><span class="dot" style="background: #0d6efd;"></span>अंदाजित वाढ</span>
-            </div>
-
-            <!-- Summary Cards -->
-            <div class="stats-grid">
-                <div class="stat-box bg-yellow">
-                    <div class="stat-title">Step-Up सह एकूण गुंतवणूक</div>
-                    <div class="stat-val" id="totalInvestedStepUp" style="color: #d84315;">₹0</div>
-                </div>
-                <div class="stat-box bg-yellow">
-                    <div class="stat-title">Step-Up सह अंदाजित वाढ</div>
-                    <div class="stat-val" id="totalGainStepUp" style="color: #d84315;">₹0</div>
-                </div>
-            </div>
-
-            <div class="stat-box bg-blue">
-                <div class="stat-title">Step-Up सह अंतिम भविष्यातील मूल्य (Total Future Value)</div>
-                <div class="stat-val" id="totalFVStepUp" style="color: #0d6efd; font-size: 18px;">₹0</div>
+        <div class="result-box">
+            <div class="card">
+                <div class="card-title">Normal SIP Projection</div>
+                <div class="row"><span>एकूण गुंतवणूक:</span><span id="c1_inv">₹0</span></div>
+                <div class="row"><span>अंदाजित परतावा:</span><span id="c1_gain">₹0</span></div>
+                <div class="row total"><span>अंतिम मुदत मूल्य (FV):</span><span id="c1_fv">₹0</span></div>
             </div>
         </div>
     </div>
 
-    <!-- Yearly Breakdown Table -->
-    <div class="table-container">
-        <h4 style="margin-bottom: 10px; color: #444;">वार्षिक गुंतवणुकीचा तक्ता (SIP Step Up Summary)</h4>
-        <table>
-            <thead>
-                <tr>
-                    <th>वर्ष</th>
-                    <th>मासिक SIP (₹)</th>
-                    <th>वार्षिक गुंतवणूक (₹)</th>
-                    <th>एकूण गुंतवणूक (₹)</th>
-                    <th>अंतिम मूल्य (₹)</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody"></tbody>
-        </table>
+    <!-- CALC 2: Step-Up vs Normal Comparison -->
+    <div id="calc2" class="calc-form">
+        <div class="form-grid">
+            <div class="input-group">
+                <label>प्रारंभिक मासिक SIP रक्कम (₹):</label>
+                <input type="number" id="c2_p" value="5000" oninput="runCalc2()">
+            </div>
+            <div class="input-group">
+                <label>Step-Up चा प्रकार:</label>
+                <div class="radio-group">
+                    <label><input type="radio" name="c2_type" value="pct" checked onchange="runCalc2()"> टक्केवारी (%)</label>
+                    <label><input type="radio" name="c2_type" value="amt" onchange="runCalc2()"> रक्कम (₹ Amount)</label>
+                </div>
+            </div>
+            <div class="input-group">
+                <label id="c2_step_label">वार्षिक Step-Up (%):</label>
+                <input type="number" id="c2_step" value="10" oninput="runCalc2()">
+            </div>
+            <div class="input-group">
+                <label>अपेक्षित परतावा दर (% प्रति वर्ष):</label>
+                <input type="number" id="c2_r" value="12" step="0.5" oninput="runCalc2()">
+            </div>
+            <div class="input-group">
+                <label>कालावधी (वर्षे):</label>
+                <input type="number" id="c2_n" value="15" oninput="runCalc2()">
+            </div>
+        </div>
+
+        <div class="comparison-grid">
+            <div class="card">
+                <div class="card-title">Normal SIP (विना Step-Up)</div>
+                <div class="row"><span>एकूण गुंतवणूक:</span><span id="c2_norm_inv">₹0</span></div>
+                <div class="row total"><span>भविष्यातील मूल्य (FV):</span><span id="c2_norm_fv">₹0</span></div>
+            </div>
+            <div class="card stepup">
+                <div class="card-title">Step-Up SIP</div>
+                <div class="row"><span>एकूण गुंतवणूक:</span><span id="c2_step_inv">₹0</span></div>
+                <div class="row total stepup"><span>भविष्यातील मूल्य (FV):</span><span id="c2_step_fv">₹0</span></div>
+            </div>
+        </div>
+        <div class="diff-box" id="c2_diff">Step-Up मुळे फायदा: ₹0 अतिरिक्त मिळतील!</div>
     </div>
 
-    <!-- Single Click PDF Export Button -->
+    <!-- CALC 3: Normal SIP + Inflation -->
+    <div id="calc3" class="calc-form">
+        <div class="form-grid">
+            <div class="input-group">
+                <label>मासिक SIP रक्कम (₹):</label>
+                <input type="number" id="c3_p" value="5000" oninput="runCalc3()">
+            </div>
+            <div class="input-group">
+                <label>अपेक्षित परतावा दर (% प्रति वर्ष):</label>
+                <input type="number" id="c3_r" value="12" step="0.5" oninput="runCalc3()">
+            </div>
+            <div class="input-group">
+                <label>अपेक्षित महागाई दर (% Inflation):</label>
+                <input type="number" id="c3_inf" value="6" step="0.5" oninput="runCalc3()">
+            </div>
+            <div class="input-group">
+                <label>कालावधी (वर्षे):</label>
+                <input type="number" id="c3_n" value="15" oninput="runCalc3()">
+            </div>
+        </div>
+        <div class="result-box">
+            <div class="card">
+                <div class="card-title">Inflation Adjusted Projection</div>
+                <div class="row"><span>एकूण गुंतवणूक:</span><span id="c3_inv">₹0</span></div>
+                <div class="row"><span>भविष्यातील मूल्य (Nominal FV):</span><span id="c3_fv">₹0</span></div>
+                <div class="row total" style="color: #d97706;"><span>आजची खरेदी क्षमता (Real Purchasing Power):</span><span id="c3_real">₹0</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CALC 4: Step-Up + Inflation vs Normal Comparison -->
+    <div id="calc4" class="calc-form">
+        <div class="form-grid">
+            <div class="input-group">
+                <label>प्रारंभिक मासिक SIP रक्कम (₹):</label>
+                <input type="number" id="c4_p" value="5000" oninput="runCalc4()">
+            </div>
+            <div class="input-group">
+                <label>Step-Up चा प्रकार:</label>
+                <div class="radio-group">
+                    <label><input type="radio" name="c4_type" value="pct" checked onchange="runCalc4()"> टक्केवारी (%)</label>
+                    <label><input type="radio" name="c4_type" value="amt" onchange="runCalc4()"> रक्कम (₹ Amount)</label>
+                </div>
+            </div>
+            <div class="input-group">
+                <label id="c4_step_label">वार्षिक Step-Up (%):</label>
+                <input type="number" id="c4_step" value="10" oninput="runCalc4()">
+            </div>
+            <div class="input-group">
+                <label>अपेक्षित परतावा दर (%):</label>
+                <input type="number" id="c4_r" value="12" step="0.5" oninput="runCalc4()">
+            </div>
+            <div class="input-group">
+                <label>अपेक्षित महागाई दर (% Inflation):</label>
+                <input type="number" id="c4_inf" value="6" step="0.5" oninput="runCalc4()">
+            </div>
+            <div class="input-group">
+                <label>कालावधी (वर्षे):</label>
+                <input type="number" id="c4_n" value="15" oninput="runCalc4()">
+            </div>
+        </div>
+
+        <div class="comparison-grid">
+            <div class="card">
+                <div class="card-title">Normal SIP (Inflation Adjusted)</div>
+                <div class="row"><span>भविष्यातील मूल्य (FV):</span><span id="c4_norm_fv">₹0</span></div>
+                <div class="row total"><span>आजची खरेदी क्षमता:</span><span id="c4_norm_real">₹0</span></div>
+            </div>
+            <div class="card stepup">
+                <div class="card-title">Step-Up SIP (Inflation Adjusted)</div>
+                <div class="row"><span>भविष्यातील मूल्य (FV):</span><span id="c4_step_fv">₹0</span></div>
+                <div class="row total stepup"><span>आजची खरेदी क्षमता:</span><span id="c4_step_real">₹0</span></div>
+            </div>
+        </div>
+        <div class="diff-box" id="c4_diff">Step-Up मुळे महागाईवर मात करून खरेदी क्षमतेत होणारी वाढ: ₹0</div>
+    </div>
+
+    <!-- Print / Export Button -->
     <button class="btn-pdf" onclick="window.print()">📥 १-क्लिक मध्ये PDF डाऊनलोड / प्रिंट करा</button>
 
     <!-- Disclaimer -->
     <div class="disclaimer">
-        *म्युच्युअल फंड गुंतवणुकी बाजारातील जोखमीच्या अधीन आहेत. सर्व योजनेसंबंधी कागदपत्रे काळजीपूर्वक वाचा.<br>
-        *हे कॅल्क्युलेशन केवळ मार्गदर्शनासाठी आणि काल्पनिक परताव्याच्या गृहीतकावर आधारित आहे.
+        Past performance may or may not be sustained in future and is not a guarantee of any future returns.<br>
+        Please note that these calculators are for illustrations only and do not represent actual returns.<br>
+        Mutual Funds do not have a fixed rate of return and it is not possible to predict the rate of return.<br>
+        Mutual Fund Investments are subject to market risks, read all scheme related documents carefully.
     </div>
 </div>
 
 <script>
+    // Format Currency
     function fmt(num) {
         return "₹" + Math.round(num).toLocaleString('en-IN');
     }
 
-    function syncInputs(sourceId, targetId) {
-        document.getElementById(targetId).value = document.getElementById(sourceId).value;
+    // Tab Switcher
+    function switchTab(evt, calcId) {
+        let forms = document.getElementsByClassName("calc-form");
+        for (let f of forms) f.classList.remove("active");
+        let tabs = document.getElementsByClassName("tab-btn");
+        for (let t of tabs) t.classList.remove("active");
+        document.getElementById(calcId).classList.add("active");
+        evt.currentTarget.classList.add("active");
     }
 
-    function calculate() {
-        let p = parseFloat(document.getElementById('monthlySIP').value) || 0;
-        let years = parseInt(document.getElementById('years').value) || 0;
-        let r = (parseFloat(document.getElementById('returnRate').value) || 0) / 12 / 100;
-        let step = (parseFloat(document.getElementById('stepUp').value) || 0) / 100;
+    // Set Today's Date
+    document.getElementById('reportDate').value = new Date().toLocaleDateString('en-IN');
 
-        let fv = 0;
-        let totalInv = 0;
+    // --- CALC 1: Normal SIP ---
+    function runCalc1() {
+        let p = parseFloat(document.getElementById('c1_p').value) || 0;
+        let r = (parseFloat(document.getElementById('c1_r').value) || 0) / 12 / 100;
+        let n = (parseFloat(document.getElementById('c1_n').value) || 0) * 12;
+
+        let fv = p * ((Math.pow(1 + r, n) - 1) / r) * (1 + r);
+        let totalInv = p * n;
+
+        document.getElementById('c1_inv').innerText = fmt(totalInv);
+        document.getElementById('c1_gain').innerText = fmt(fv - totalInv);
+        document.getElementById('c1_fv').innerText = fmt(fv);
+    }
+
+    // --- CALC 2: Step-Up vs Normal ---
+    function runCalc2() {
+        let p = parseFloat(document.getElementById('c2_p').value) || 0;
+        let isPct = document.querySelector('input[name="c2_type"]:checked').value === 'pct';
+        let stepVal = parseFloat(document.getElementById('c2_step').value) || 0;
+        let r = (parseFloat(document.getElementById('c2_r').value) || 0) / 12 / 100;
+        let years = parseInt(document.getElementById('c2_n').value) || 0;
+
+        document.getElementById('c2_step_label').innerText = isPct ? "वार्षिक Step-Up (%):" : "वार्षिक Step-Up रक्कम (₹):";
+
+        // Normal SIP
+        let normFv = p * ((Math.pow(1 + r, years * 12) - 1) / r) * (1 + r);
+        let normInv = p * years * 12;
+
+        // Step-Up SIP
+        let stepFv = 0;
+        let stepInv = 0;
         let currP = p;
-        let tableHTML = "";
 
         for (let y = 1; y <= years; y++) {
-            let yearlyInv = currP * 12;
             for (let m = 1; m <= 12; m++) {
-                fv = (fv + currP) * (1 + r);
-                totalInv += currP;
+                stepFv = (stepFv + currP) * (1 + r);
+                stepInv += currP;
             }
-            
-            tableHTML += `<tr>
-                <td>Year ${y}</td>
-                <td>${Math.round(currP).toLocaleString('en-IN')}</td>
-                <td>${Math.round(yearlyInv).toLocaleString('en-IN')}</td>
-                <td>${Math.round(totalInv).toLocaleString('en-IN')}</td>
-                <td>${Math.round(fv).toLocaleString('en-IN')}</td>
-            </tr>`;
-
-            currP = currP * (1 + step);
+            if (isPct) {
+                currP = currP * (1 + (stepVal / 100));
+            } else {
+                currP += stepVal;
+            }
         }
 
-        let totalGain = fv - totalInv;
+        document.getElementById('c2_norm_inv').innerText = fmt(normInv);
+        document.getElementById('c2_norm_fv').innerText = fmt(normFv);
+        document.getElementById('c2_step_inv').innerText = fmt(stepInv);
+        document.getElementById('c2_step_fv').innerText = fmt(stepFv);
 
-        // Update UI Text
-        document.getElementById('totalInvestedStepUp').innerText = fmt(totalInv);
-        document.getElementById('totalGainStepUp').innerText = fmt(totalGain);
-        document.getElementById('totalFVStepUp').innerText = fmt(fv);
-        document.getElementById('tableBody').innerHTML = tableHTML;
-
-        // Update Dynamic Donut Chart Ratio
-        let invPercent = Math.round((totalInv / fv) * 100) || 0;
-        document.getElementById('chartDonut').style.background = 
-            `conic-gradient(#ffc107 0% ${invPercent}%, #0d6efd ${invPercent}% 100%)`;
+        let diffFv = stepFv - normFv;
+        let diffInv = stepInv - normInv;
+        document.getElementById('c2_diff').innerText = `Step-Up मुळे ₹${Math.round(diffInv).toLocaleString('en-IN')} अतिरिक्त गुंतवून ₹${Math.round(diffFv).toLocaleString('en-IN')} जास्त मिळतील!`;
     }
 
-    // Initialize calculation on load
-    window.onload = calculate;
+    // --- CALC 3: Normal SIP + Inflation ---
+    function runCalc3() {
+        let p = parseFloat(document.getElementById('c3_p').value) || 0;
+        let r = (parseFloat(document.getElementById('c3_r').value) || 0) / 12 / 100;
+        let inf = (parseFloat(document.getElementById('c3_inf').value) || 0) / 100;
+        let years = parseFloat(document.getElementById('c3_n').value) || 0;
+        let n = years * 12;
+
+        let fv = p * ((Math.pow(1 + r, n) - 1) / r) * (1 + r);
+        let totalInv = p * n;
+        let realVal = fv / Math.pow(1 + inf, years);
+
+        document.getElementById('c3_inv').innerText = fmt(totalInv);
+        document.getElementById('c3_fv').innerText = fmt(fv);
+        document.getElementById('c3_real').innerText = fmt(realVal);
+    }
+
+    // --- CALC 4: Step-Up + Inflation vs Normal ---
+    function runCalc4() {
+        let p = parseFloat(document.getElementById('c4_p').value) || 0;
+        let isPct = document.querySelector('input[name="c4_type"]:checked').value === 'pct';
+        let stepVal = parseFloat(document.getElementById('c4_step').value) || 0;
+        let r = (parseFloat(document.getElementById('c4_r').value) || 0) / 12 / 100;
+        let inf = (parseFloat(document.getElementById('c4_inf').value) || 0) / 100;
+        let years = parseInt(document.getElementById('c4_n').value) || 0;
+
+        document.getElementById('c4_step_label').innerText = isPct ? "वार्षिक Step-Up (%):" : "वार्षिक Step-Up रक्कम (₹):";
+
+        // Normal SIP
+        let normFv = p * ((Math.pow(1 + r, years * 12) - 1) / r) * (1 + r);
+        let normReal = normFv / Math.pow(1 + inf, years);
+
+        // Step-Up SIP
+        let stepFv = 0;
+        let currP = p;
+
+        for (let y = 1; y <= years; y++) {
+            for (let m = 1; m <= 12; m++) {
+                stepFv = (stepFv + currP) * (1 + r);
+            }
+            if (isPct) {
+                currP = currP * (1 + (stepVal / 100));
+            } else {
+                currP += stepVal;
+            }
+        }
+        let stepReal = stepFv / Math.pow(1 + inf, years);
+
+        document.getElementById('c4_norm_fv').innerText = fmt(normFv);
+        document.getElementById('c4_norm_real').innerText = fmt(normReal);
+        document.getElementById('c4_step_fv').innerText = fmt(stepFv);
+        document.getElementById('c4_step_real').innerText = fmt(stepReal);
+
+        let diffReal = stepReal - normReal;
+        document.getElementById('c4_diff').innerText = `Step-Up मुळे आजच्या मूल्यांनुसार (Purchasing Power) अतिरिक्त वाढ: ${fmt(diffReal)}`;
+    }
+
+    // Run all calculations on page load
+    window.onload = function() {
+        runCalc1();
+        runCalc2();
+        runCalc3();
+        runCalc4();
+    };
+
+    // PWA Service Worker Registration
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('Service Worker Registered'))
+          .catch(err => console.log('Service Worker Failed', err));
+      });
+    }
 </script>
 
 </body>
