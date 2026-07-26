@@ -78,7 +78,7 @@
         .grid-line { position: absolute; left: 0; right: 0; border-top: 1px dashed #e5e7eb; width: 100%; pointer-events: none; }
         
         .bar-wrapper { display: flex; flex-direction: column; align-items: center; width: 100px; z-index: 2; }
-        .bar-val-top { font-size: 12px; font-weight: 800; margin-bottom: 6px; text-align: center; }
+        .bar-val-top { font-size: 12px; font-weight: 800; margin-bottom: 6px; text-align: center; white-space: nowrap; }
         .bar-val-green { color: #00bfa5; }
         .bar-val-orange { color: #f5a623; }
         
@@ -334,7 +334,7 @@
                     <div class="bar-track">
                         <div class="bar-body bg-orange" id="bar2_shape" style="height: 100%;"></div>
                     </div>
-                    <div class="bar-x-label">Total Value (with Step-Up)</div>
+                    <div class="bar-x-label">Total Value</div>
                 </div>
             </div>
         </div>
@@ -591,8 +591,8 @@
         document.getElementById('bar2_shape').style.height = bar2Pct + '%';
 
         // Labels
-        document.getElementById('bar1_top_val').innerText = fmtLakhShort(inv);
-        document.getElementById('bar2_top_val').innerText = fmtLakhShort(fv);
+        document.getElementById('bar1_top_val').innerText = fmtLakhWords(inv);
+        document.getElementById('bar2_top_val').innerText = fmtLakhWords(fv);
 
         document.getElementById('legend_inv_val').innerText = fmtLakhWords(inv);
         document.getElementById('legend_fv_val').innerText = fmtLakhWords(fv);
