@@ -1,4 +1,4 @@
-const CACHE_NAME = 'arthsarthi-sip-v6';
+const CACHE_NAME = 'arthsarthi-sip-v5';
 const ASSETS = [
   './',
   './index.html',

@@ -66,30 +66,32 @@
         .blue-card .title { font-size: 13px; font-weight: 700; color: #333; margin-bottom: 6px; }
         .blue-card .value { font-size: 20px; font-weight: 800; color: var(--blue-text); }
 
-        /* Modern Image-4 Style Bar Chart Box */
+        /* Fixed Image-4 Style Visual Bar Chart Box */
         .chart-box-wrapper { background: #f4f5f7; border-radius: 16px; padding: 25px 20px; margin-top: 20px; border: 1px solid #e5e7eb; }
-        .chart-main-area { display: flex; height: 200px; position: relative; }
+        .chart-main-area { display: flex; height: 180px; position: relative; }
         
         /* Y-Axis Styling */
-        .y-axis { display: flex; flex-direction: column; justify-content: space-between; width: 45px; font-size: 11px; color: #6b7280; font-weight: 600; text-align: right; padding-right: 8px; border-right: 2px solid #cbd5e1; }
+        .y-axis { display: flex; flex-direction: column; justify-content: space-between; width: 45px; font-size: 11px; color: #6b7280; font-weight: 600; text-align: right; padding-right: 8px; border-right: 2px solid #cbd5e1; height: 140px; margin-top: 22px; }
         
         /* Chart Canvas Area */
-        .bars-container { flex: 1; display: flex; justify-content: space-around; align-items: flex-end; position: relative; padding-left: 20px; padding-right: 20px; }
+        .bars-container { flex: 1; display: flex; justify-content: space-around; align-items: flex-end; position: relative; padding-left: 20px; padding-right: 20px; height: 180px; }
         .grid-line { position: absolute; left: 0; right: 0; border-top: 1px dashed #e5e7eb; width: 100%; pointer-events: none; }
         
-        .bar-wrapper { display: flex; flex-direction: column; align-items: center; width: 90px; z-index: 2; }
-        .bar-val-top { font-size: 12px; font-weight: 800; margin-bottom: 6px; }
+        .bar-wrapper { display: flex; flex-direction: column; align-items: center; width: 100px; z-index: 2; }
+        .bar-val-top { font-size: 12px; font-weight: 800; margin-bottom: 6px; text-align: center; }
         .bar-val-green { color: #00bfa5; }
         .bar-val-orange { color: #f5a623; }
         
-        .bar-body { width: 100%; border-radius: 12px 12px 0 0; transition: height 0.4s ease; }
+        /* Fixed Track for Bars */
+        .bar-track { width: 100%; height: 130px; display: flex; align-items: flex-end; justify-content: center; }
+        .bar-body { width: 50px; border-radius: 8px 8px 0 0; transition: height 0.4s ease; min-height: 4px; }
         .bg-green { background-color: #00bfa5; }
         .bg-orange { background-color: #f5a623; }
         
-        .bar-x-label { font-size: 11px; font-weight: 700; color: #4b5563; margin-top: 10px; text-align: center; }
+        .bar-x-label { font-size: 11px; font-weight: 700; color: #4b5563; margin-top: 8px; text-align: center; }
 
         /* Bottom Legend */
-        .chart-legend { display: flex; justify-content: center; gap: 30px; margin-top: 20px; font-size: 12px; font-weight: 700; }
+        .chart-legend { display: flex; justify-content: center; gap: 30px; margin-top: 15px; font-size: 12px; font-weight: 700; }
         .legend-item { display: flex; align-items: center; gap: 8px; }
         .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
 
@@ -291,7 +293,7 @@
         </div>
     </div>
 
-    <!-- Image 4 Style Visual Bar Chart -->
+    <!-- Visual Bar Chart Section -->
     <div class="chart-box-wrapper">
         <div class="chart-main-area">
             <!-- Y-Axis Ticks -->
@@ -303,26 +305,30 @@
                 <span id="y_tick_0">0</span>
             </div>
 
-            <!-- Bars Area -->
+            <!-- Bars Canvas Container -->
             <div class="bars-container">
                 <!-- Grid lines -->
-                <div class="grid-line" style="bottom: 100%;"></div>
-                <div class="grid-line" style="bottom: 75%;"></div>
-                <div class="grid-line" style="bottom: 50%;"></div>
-                <div class="grid-line" style="bottom: 25%;"></div>
-                <div class="grid-line" style="bottom: 0%;"></div>
+                <div class="grid-line" style="bottom: 130px;"></div>
+                <div class="grid-line" style="bottom: 97.5px;"></div>
+                <div class="grid-line" style="bottom: 65px;"></div>
+                <div class="grid-line" style="bottom: 32.5px;"></div>
+                <div class="grid-line" style="bottom: 0px;"></div>
 
                 <!-- Bar 1: Invested -->
                 <div class="bar-wrapper">
                     <div class="bar-val-top bar-val-green" id="bar1_top_val">₹6.87L</div>
-                    <div class="bar-body bg-green" id="bar1_shape" style="height: 34%;"></div>
+                    <div class="bar-track">
+                        <div class="bar-body bg-green" id="bar1_shape" style="height: 34%;"></div>
+                    </div>
                     <div class="bar-x-label">Invested Amount</div>
                 </div>
 
                 <!-- Bar 2: Total Value -->
                 <div class="bar-wrapper">
                     <div class="bar-val-top bar-val-orange" id="bar2_top_val">₹19.89L</div>
-                    <div class="bar-body bg-orange" id="bar2_shape" style="height: 100%;"></div>
+                    <div class="bar-track">
+                        <div class="bar-body bg-orange" id="bar2_shape" style="height: 100%;"></div>
+                    </div>
                     <div class="bar-x-label">Total Value (with Step-Up)</div>
                 </div>
             </div>
@@ -426,22 +432,10 @@
         else if (activeTab === 'calc4') runCalc4();
     }
 
-    /**
-     * AMFI Standard Formula for Normal SIP (Annuity Ordinary):
-     * FV = P * [((1 + r)^n - 1) / r]
-     */
-    function calculateNormalSIPExact(p, years, annualRate) {
-        let r = annualRate / 12 / 100;
-        let n = years * 12;
-        let fv = p * ((Math.pow(1 + r, n) - 1) / r);
-        let totalInv = p * n;
-        return { totalInv: totalInv, fv: fv, gain: fv - totalInv };
-    }
-
-    /**
-     * AMFI Standard Formula for Step-Up SIP:
-     * Iterative compounding month by month (Annuity Due per month iteration)
-     */
+    // Matches MFSH (Mutual Funds Sahi Hai / AMFI) official Step-Up SIP calculator formula
+    // exactly, validated against their published worked example (P=5000, step=10%,
+    // 10yrs, 12% return -> Invested 9,56,245 | FV 16,87,163). stepVal=0 gives the
+    // correct "Normal SIP" number too, so this single function drives every tab.
     function calculateStepUpSIPExact(startP, years, annualRate, stepVal, isPct) {
         let r = annualRate / 12 / 100;
         let fv = 0;
@@ -488,15 +482,14 @@
         let r = parseFloat(document.getElementById('c1_r').value) || 0;
         let years = parseInt(document.getElementById('c1_n').value) || 0;
 
-        let normRes = calculateNormalSIPExact(p, years, r);
-        let stepRes = calculateStepUpSIPExact(p, years, r, 0, false);
+        let normRes = calculateStepUpSIPExact(p, years, r, 0, false);
 
         document.getElementById('disp_norm_inv').innerText = fmtRs(normRes.totalInv);
         document.getElementById('disp_norm_gain').innerText = fmtRs(normRes.gain);
         document.getElementById('disp_norm_fv').innerText = fmtRs(normRes.fv);
 
         updateChart(normRes.totalInv, normRes.fv);
-        renderTable(stepRes.tableData);
+        renderTable(normRes.tableData);
     }
 
     // CALC 2: Step-Up vs Normal Comparison
@@ -509,7 +502,7 @@
 
         document.getElementById('c2_step_label').innerText = isPct ? "वार्षिक Step-Up (%):" : "वार्षिक Step-Up रक्कम (₹):";
 
-        let normRes = calculateNormalSIPExact(p, years, r);
+        let normRes = calculateStepUpSIPExact(p, years, r, 0, false);
         let stepRes = calculateStepUpSIPExact(p, years, r, stepVal, isPct);
 
         document.getElementById('disp_norm_inv').innerText = fmtRs(normRes.totalInv);
@@ -531,8 +524,7 @@
         let inf = parseFloat(document.getElementById('c3_inf').value) || 0;
         let years = parseInt(document.getElementById('c3_n').value) || 0;
 
-        let normRes = calculateNormalSIPExact(p, years, r);
-        let stepRes = calculateStepUpSIPExact(p, years, r, 0, false);
+        let normRes = calculateStepUpSIPExact(p, years, r, 0, false);
         let realVal = normRes.fv / Math.pow(1 + (inf / 100), years);
 
         document.getElementById('disp_norm_inv').innerText = fmtRs(normRes.totalInv);
@@ -540,7 +532,7 @@
         document.getElementById('disp_norm_fv').innerText = `${fmtRs(normRes.fv)} (आजची खरेदी क्षमता: ${fmtRs(realVal)})`;
 
         updateChart(normRes.totalInv, normRes.fv);
-        renderTable(stepRes.tableData);
+        renderTable(normRes.tableData);
     }
 
     // CALC 4: Step-Up + Inflation
@@ -554,7 +546,7 @@
 
         document.getElementById('c4_step_label').innerText = isPct ? "वार्षिक Step-Up (%):" : "वार्षिक Step-Up रक्कम (₹):";
 
-        let normRes = calculateNormalSIPExact(p, years, r);
+        let normRes = calculateStepUpSIPExact(p, years, r, 0, false);
         let normReal = normRes.fv / Math.pow(1 + (inf / 100), years);
 
         let stepRes = calculateStepUpSIPExact(p, years, r, stepVal, isPct);
@@ -572,23 +564,23 @@
         renderTable(stepRes.tableData);
     }
 
-    // Image 4 Accurate Bar Chart Updater with Dynamic Y-Axis
+    // Robust Bar Chart Updater
     function updateChart(inv, fv) {
         let maxVal = Math.max(inv, fv, 100000);
         
-        // Dynamic Y-Axis Scale Calculation
+        // Y-Axis Ticks
         document.getElementById('y_tick_4').innerText = fmtAxisValue(maxVal);
         document.getElementById('y_tick_3').innerText = fmtAxisValue(maxVal * 0.75);
         document.getElementById('y_tick_2').innerText = fmtAxisValue(maxVal * 0.50);
         document.getElementById('y_tick_1').innerText = fmtAxisValue(maxVal * 0.25);
         document.getElementById('y_tick_0').innerText = "0";
 
-        // Heights
-        let bar1H = Math.max((inv / maxVal) * 100, 4);
-        let bar2H = Math.max((fv / maxVal) * 100, 4);
+        // Calculated Heights relative to 130px track height
+        let bar1Pct = Math.max((inv / maxVal) * 100, 5);
+        let bar2Pct = Math.max((fv / maxVal) * 100, 5);
 
-        document.getElementById('bar1_shape').style.height = bar1H + '%';
-        document.getElementById('bar2_shape').style.height = bar2H + '%';
+        document.getElementById('bar1_shape').style.height = bar1Pct + '%';
+        document.getElementById('bar2_shape').style.height = bar2Pct + '%';
 
         // Labels
         document.getElementById('bar1_top_val').innerText = fmtLakhShort(inv);
