@@ -66,18 +66,32 @@
         .blue-card .title { font-size: 13px; font-weight: 700; color: #333; margin-bottom: 6px; }
         .blue-card .value { font-size: 20px; font-weight: 800; color: var(--blue-text); }
 
-        /* Bar Chart Section */
-        .chart-box-wrapper { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-top: 20px; text-align: center; }
-        .bar-chart-container { display: flex; justify-content: center; align-items: flex-end; gap: 50px; height: 180px; margin: 20px 0 10px 0; border-bottom: 2px solid #cbd5e1; padding-bottom: 2px; }
-        .bar-group { display: flex; flex-direction: column; align-items: center; width: 90px; }
-        .bar-label-top { font-size: 11px; font-weight: bold; margin-bottom: 6px; color: #334155; }
-        .bar-shape { width: 100%; border-radius: 10px 10px 0 0; transition: height 0.4s ease; }
-        .bar-green { background-color: #00bfa5; }
-        .bar-orange { background-color: #f5a623; }
-        .bar-axis-title { font-size: 11px; font-weight: 600; color: #64748b; margin-top: 8px; }
-        .chart-legend { display: flex; justify-content: center; gap: 25px; margin-top: 15px; font-size: 12px; font-weight: 700; }
-        .legend-item { display: flex; align-items: center; gap: 6px; }
-        .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+        /* Modern Image-4 Style Bar Chart Box */
+        .chart-box-wrapper { background: #f4f5f7; border-radius: 16px; padding: 25px 20px; margin-top: 20px; border: 1px solid #e5e7eb; }
+        .chart-main-area { display: flex; height: 200px; position: relative; }
+        
+        /* Y-Axis Styling */
+        .y-axis { display: flex; flex-direction: column; justify-content: space-between; width: 45px; font-size: 11px; color: #6b7280; font-weight: 600; text-align: right; padding-right: 8px; border-right: 2px solid #cbd5e1; }
+        
+        /* Chart Canvas Area */
+        .bars-container { flex: 1; display: flex; justify-content: space-around; align-items: flex-end; position: relative; padding-left: 20px; padding-right: 20px; }
+        .grid-line { position: absolute; left: 0; right: 0; border-top: 1px dashed #e5e7eb; width: 100%; pointer-events: none; }
+        
+        .bar-wrapper { display: flex; flex-direction: column; align-items: center; width: 90px; z-index: 2; }
+        .bar-val-top { font-size: 12px; font-weight: 800; margin-bottom: 6px; }
+        .bar-val-green { color: #00bfa5; }
+        .bar-val-orange { color: #f5a623; }
+        
+        .bar-body { width: 100%; border-radius: 12px 12px 0 0; transition: height 0.4s ease; }
+        .bg-green { background-color: #00bfa5; }
+        .bg-orange { background-color: #f5a623; }
+        
+        .bar-x-label { font-size: 11px; font-weight: 700; color: #4b5563; margin-top: 10px; text-align: center; }
+
+        /* Bottom Legend */
+        .chart-legend { display: flex; justify-content: center; gap: 30px; margin-top: 20px; font-size: 12px; font-weight: 700; }
+        .legend-item { display: flex; align-items: center; gap: 8px; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
 
         /* Yearwise Breakdown Table */
         .table-container { margin-top: 25px; overflow-x: auto; }
@@ -143,7 +157,7 @@
         <div class="form-grid">
             <div class="input-group">
                 <label>मासिक SIP रक्कम (₹):</label>
-                <input type="number" id="c1_p" value="25000" oninput="runAll()">
+                <input type="number" id="c1_p" value="1000" oninput="runAll()">
             </div>
             <div class="input-group">
                 <label>अपेक्षित परतावा दर (% प्रति वर्ष):</label>
@@ -151,7 +165,7 @@
             </div>
             <div class="input-group">
                 <label>कालावधी (वर्षे):</label>
-                <input type="number" id="c1_n" value="15" oninput="runAll()">
+                <input type="number" id="c1_n" value="20" oninput="runAll()">
             </div>
         </div>
     </div>
@@ -161,7 +175,7 @@
         <div class="form-grid">
             <div class="input-group">
                 <label>प्रारंभिक मासिक SIP रक्कम (₹):</label>
-                <input type="number" id="c2_p" value="25000" oninput="runAll()">
+                <input type="number" id="c2_p" value="1000" oninput="runAll()">
             </div>
             <div class="input-group">
                 <label>Step-Up चा प्रकार:</label>
@@ -180,7 +194,7 @@
             </div>
             <div class="input-group">
                 <label>कालावधी (वर्षे):</label>
-                <input type="number" id="c2_n" value="25" oninput="runAll()">
+                <input type="number" id="c2_n" value="20" oninput="runAll()">
             </div>
         </div>
     </div>
@@ -190,7 +204,7 @@
         <div class="form-grid">
             <div class="input-group">
                 <label>मासिक SIP रक्कम (₹):</label>
-                <input type="number" id="c3_p" value="25000" oninput="runAll()">
+                <input type="number" id="c3_p" value="1000" oninput="runAll()">
             </div>
             <div class="input-group">
                 <label>अपेक्षित परतावा दर (% प्रति वर्ष):</label>
@@ -202,7 +216,7 @@
             </div>
             <div class="input-group">
                 <label>कालावधी (वर्षे):</label>
-                <input type="number" id="c3_n" value="15" oninput="runAll()">
+                <input type="number" id="c3_n" value="20" oninput="runAll()">
             </div>
         </div>
     </div>
@@ -212,7 +226,7 @@
         <div class="form-grid">
             <div class="input-group">
                 <label>प्रारंभिक मासिक SIP रक्कम (₹):</label>
-                <input type="number" id="c4_p" value="25000" oninput="runAll()">
+                <input type="number" id="c4_p" value="1000" oninput="runAll()">
             </div>
             <div class="input-group">
                 <label>Step-Up चा प्रकार:</label>
@@ -235,7 +249,7 @@
             </div>
             <div class="input-group">
                 <label>कालावधी (वर्षे):</label>
-                <input type="number" id="c4_n" value="25" oninput="runAll()">
+                <input type="number" id="c4_n" value="20" oninput="runAll()">
             </div>
         </div>
     </div>
@@ -277,28 +291,52 @@
         </div>
     </div>
 
-    <!-- Visual Bar Chart Section -->
+    <!-- Image 4 Style Visual Bar Chart -->
     <div class="chart-box-wrapper">
-        <div class="bar-chart-container">
-            <div class="bar-group">
-                <div class="bar-label-top" id="bar1_top_val">₹0</div>
-                <div class="bar-shape bar-green" id="bar1_shape" style="height: 50%;"></div>
-                <div class="bar-axis-title">Invested Amount</div>
+        <div class="chart-main-area">
+            <!-- Y-Axis Ticks -->
+            <div class="y-axis">
+                <span id="y_tick_4">20L</span>
+                <span id="y_tick_3">15L</span>
+                <span id="y_tick_2">10L</span>
+                <span id="y_tick_1">5L</span>
+                <span id="y_tick_0">0</span>
             </div>
-            <div class="bar-group">
-                <div class="bar-label-top" id="bar2_top_val">₹0</div>
-                <div class="bar-shape bar-orange" id="bar2_shape" style="height: 100%;"></div>
-                <div class="bar-axis-title">Total Value (with Step-Up)</div>
+
+            <!-- Bars Area -->
+            <div class="bars-container">
+                <!-- Grid lines -->
+                <div class="grid-line" style="bottom: 100%;"></div>
+                <div class="grid-line" style="bottom: 75%;"></div>
+                <div class="grid-line" style="bottom: 50%;"></div>
+                <div class="grid-line" style="bottom: 25%;"></div>
+                <div class="grid-line" style="bottom: 0%;"></div>
+
+                <!-- Bar 1: Invested -->
+                <div class="bar-wrapper">
+                    <div class="bar-val-top bar-val-green" id="bar1_top_val">₹6.87L</div>
+                    <div class="bar-body bg-green" id="bar1_shape" style="height: 34%;"></div>
+                    <div class="bar-x-label">Invested Amount</div>
+                </div>
+
+                <!-- Bar 2: Total Value -->
+                <div class="bar-wrapper">
+                    <div class="bar-val-top bar-val-orange" id="bar2_top_val">₹19.89L</div>
+                    <div class="bar-body bg-orange" id="bar2_shape" style="height: 100%;"></div>
+                    <div class="bar-x-label">Total Value (with Step-Up)</div>
+                </div>
             </div>
         </div>
+
+        <!-- Legend -->
         <div class="chart-legend">
             <div class="legend-item">
-                <div class="legend-dot" style="background: #00bfa5;"></div>
-                <span>Invested Amount: <strong id="legend_inv_val">₹0</strong></span>
+                <span class="dot" style="background: #00bfa5;"></span>
+                <span>Invested Amount: <strong id="legend_inv_val">₹6.87 Lakh</strong></span>
             </div>
             <div class="legend-item">
-                <div class="legend-dot" style="background: #f5a623;"></div>
-                <span>Total Value (with Step-Up): <strong id="legend_fv_val">₹0</strong></span>
+                <span class="dot" style="background: #f5a623;"></span>
+                <span>Total Value (with Step-Up): <strong id="legend_fv_val">₹19.89 Lakh</strong></span>
             </div>
         </div>
     </div>
@@ -339,15 +377,25 @@
         return "Rs. " + Math.round(num).toLocaleString('en-IN');
     }
 
-    function fmtSym(num) {
-        return "₹" + Math.round(num).toLocaleString('en-IN');
+    function fmtLakhWords(num) {
+        if (num >= 10000000) {
+            return "₹" + (num / 10000000).toFixed(2) + " Crore";
+        }
+        return "₹" + (num / 100000).toFixed(2) + " Lakh";
     }
 
-    function fmtCompact(num) {
-        if (num >= 10000000) return "₹" + (num / 10000000).toFixed(2) + "Cr";
-        if (num >= 100000) return "₹" + (num / 100000).toFixed(2) + "L";
-        if (num >= 1000) return "₹" + (num / 1000).toFixed(2) + "K";
-        return "₹" + Math.round(num);
+    function fmtLakhShort(num) {
+        if (num >= 10000000) {
+            return "₹" + (num / 10000000).toFixed(2) + "Cr";
+        }
+        return "₹" + (num / 100000).toFixed(2) + "L";
+    }
+
+    function fmtAxisValue(num) {
+        if (num >= 10000000) return (num / 10000000).toFixed(1) + "Cr";
+        if (num >= 100000) return Math.round(num / 100000) + "L";
+        if (num >= 1000) return Math.round(num / 1000) + "K";
+        return Math.round(num);
     }
 
     function switchTab(evt, calcId) {
@@ -379,13 +427,22 @@
     }
 
     /**
-     * Standard AMFI / Mutual Funds Sahi Hai Step-Up SIP Logic:
-     * Monthly Compounding Annuity Due Formula iterated month by month.
-     * Monthly interest rate r = Annual Rate / 12 / 100
-     * End of each month: FV = (FV + Monthly Installment) * (1 + r)
-     * Yearly step-up is applied at the start of each new year (after every 12 months).
+     * AMFI Standard Formula for Normal SIP (Annuity Ordinary):
+     * FV = P * [((1 + r)^n - 1) / r]
      */
-    function calculateStandardSIP(startP, years, annualRate, stepVal, isPct) {
+    function calculateNormalSIPExact(p, years, annualRate) {
+        let r = annualRate / 12 / 100;
+        let n = years * 12;
+        let fv = p * ((Math.pow(1 + r, n) - 1) / r);
+        let totalInv = p * n;
+        return { totalInv: totalInv, fv: fv, gain: fv - totalInv };
+    }
+
+    /**
+     * AMFI Standard Formula for Step-Up SIP:
+     * Iterative compounding month by month (Annuity Due per month iteration)
+     */
+    function calculateStepUpSIPExact(startP, years, annualRate, stepVal, isPct) {
         let r = annualRate / 12 / 100;
         let fv = 0;
         let totalInv = 0;
@@ -431,17 +488,18 @@
         let r = parseFloat(document.getElementById('c1_r').value) || 0;
         let years = parseInt(document.getElementById('c1_n').value) || 0;
 
-        let res = calculateStandardSIP(p, years, r, 0, false);
+        let normRes = calculateNormalSIPExact(p, years, r);
+        let stepRes = calculateStepUpSIPExact(p, years, r, 0, false);
 
-        document.getElementById('disp_norm_inv').innerText = fmtRs(res.totalInv);
-        document.getElementById('disp_norm_gain').innerText = fmtRs(res.gain);
-        document.getElementById('disp_norm_fv').innerText = fmtRs(res.fv);
+        document.getElementById('disp_norm_inv').innerText = fmtRs(normRes.totalInv);
+        document.getElementById('disp_norm_gain').innerText = fmtRs(normRes.gain);
+        document.getElementById('disp_norm_fv').innerText = fmtRs(normRes.fv);
 
-        updateChart(res.totalInv, res.fv);
-        renderTable(res.tableData);
+        updateChart(normRes.totalInv, normRes.fv);
+        renderTable(stepRes.tableData);
     }
 
-    // CALC 2: Step-Up vs Normal
+    // CALC 2: Step-Up vs Normal Comparison
     function runCalc2() {
         let p = parseFloat(document.getElementById('c2_p').value) || 0;
         let isPct = document.querySelector('input[name="c2_type"]:checked').value === 'pct';
@@ -451,8 +509,8 @@
 
         document.getElementById('c2_step_label').innerText = isPct ? "वार्षिक Step-Up (%):" : "वार्षिक Step-Up रक्कम (₹):";
 
-        let normRes = calculateStandardSIP(p, years, r, 0, false);
-        let stepRes = calculateStandardSIP(p, years, r, stepVal, isPct);
+        let normRes = calculateNormalSIPExact(p, years, r);
+        let stepRes = calculateStepUpSIPExact(p, years, r, stepVal, isPct);
 
         document.getElementById('disp_norm_inv').innerText = fmtRs(normRes.totalInv);
         document.getElementById('disp_norm_gain').innerText = fmtRs(normRes.gain);
@@ -473,15 +531,16 @@
         let inf = parseFloat(document.getElementById('c3_inf').value) || 0;
         let years = parseInt(document.getElementById('c3_n').value) || 0;
 
-        let res = calculateStandardSIP(p, years, r, 0, false);
-        let realVal = res.fv / Math.pow(1 + (inf / 100), years);
+        let normRes = calculateNormalSIPExact(p, years, r);
+        let stepRes = calculateStepUpSIPExact(p, years, r, 0, false);
+        let realVal = normRes.fv / Math.pow(1 + (inf / 100), years);
 
-        document.getElementById('disp_norm_inv').innerText = fmtRs(res.totalInv);
-        document.getElementById('disp_norm_gain').innerText = fmtRs(res.gain);
-        document.getElementById('disp_norm_fv').innerText = `${fmtRs(res.fv)} (आजची खरेदी क्षमता: ${fmtRs(realVal)})`;
+        document.getElementById('disp_norm_inv').innerText = fmtRs(normRes.totalInv);
+        document.getElementById('disp_norm_gain').innerText = fmtRs(normRes.gain);
+        document.getElementById('disp_norm_fv').innerText = `${fmtRs(normRes.fv)} (आजची खरेदी क्षमता: ${fmtRs(realVal)})`;
 
-        updateChart(res.totalInv, res.fv);
-        renderTable(res.tableData);
+        updateChart(normRes.totalInv, normRes.fv);
+        renderTable(stepRes.tableData);
     }
 
     // CALC 4: Step-Up + Inflation
@@ -495,10 +554,10 @@
 
         document.getElementById('c4_step_label').innerText = isPct ? "वार्षिक Step-Up (%):" : "वार्षिक Step-Up रक्कम (₹):";
 
-        let normRes = calculateStandardSIP(p, years, r, 0, false);
+        let normRes = calculateNormalSIPExact(p, years, r);
         let normReal = normRes.fv / Math.pow(1 + (inf / 100), years);
 
-        let stepRes = calculateStandardSIP(p, years, r, stepVal, isPct);
+        let stepRes = calculateStepUpSIPExact(p, years, r, stepVal, isPct);
         let stepReal = stepRes.fv / Math.pow(1 + (inf / 100), years);
 
         document.getElementById('disp_norm_inv').innerText = fmtRs(normRes.totalInv);
@@ -513,20 +572,30 @@
         renderTable(stepRes.tableData);
     }
 
-    // Dynamic Chart Updater
+    // Image 4 Accurate Bar Chart Updater with Dynamic Y-Axis
     function updateChart(inv, fv) {
-        let maxVal = Math.max(inv, fv, 1);
-        let bar1H = Math.max((inv / maxVal) * 100, 8);
-        let bar2H = Math.max((fv / maxVal) * 100, 8);
+        let maxVal = Math.max(inv, fv, 100000);
+        
+        // Dynamic Y-Axis Scale Calculation
+        document.getElementById('y_tick_4').innerText = fmtAxisValue(maxVal);
+        document.getElementById('y_tick_3').innerText = fmtAxisValue(maxVal * 0.75);
+        document.getElementById('y_tick_2').innerText = fmtAxisValue(maxVal * 0.50);
+        document.getElementById('y_tick_1').innerText = fmtAxisValue(maxVal * 0.25);
+        document.getElementById('y_tick_0').innerText = "0";
+
+        // Heights
+        let bar1H = Math.max((inv / maxVal) * 100, 4);
+        let bar2H = Math.max((fv / maxVal) * 100, 4);
 
         document.getElementById('bar1_shape').style.height = bar1H + '%';
         document.getElementById('bar2_shape').style.height = bar2H + '%';
 
-        document.getElementById('bar1_top_val').innerText = fmtCompact(inv);
-        document.getElementById('bar2_top_val').innerText = fmtCompact(fv);
+        // Labels
+        document.getElementById('bar1_top_val').innerText = fmtLakhShort(inv);
+        document.getElementById('bar2_top_val').innerText = fmtLakhShort(fv);
 
-        document.getElementById('legend_inv_val').innerText = fmtSym(inv);
-        document.getElementById('legend_fv_val').innerText = fmtSym(fv);
+        document.getElementById('legend_inv_val').innerText = fmtLakhWords(inv);
+        document.getElementById('legend_fv_val').innerText = fmtLakhWords(fv);
     }
 
     // Table Renderer
