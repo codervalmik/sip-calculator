@@ -35,6 +35,10 @@
         .client-bar label { font-size: 12px; font-weight: bold; color: #475569; display: block; margin-bottom: 4px; }
         .client-bar input { width: 100%; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 13px; font-weight: 600; }
 
+        /* WhatsApp CTA Banner */
+        .cta-banner { display: flex; align-items: center; justify-content: center; gap: 8px; background: #25D366; color: white; text-decoration: none; padding: 12px 15px; border-radius: 8px; margin-bottom: 20px; font-size: 13px; font-weight: 700; text-align: center; box-shadow: 0 2px 6px rgba(37,211,102,0.35); }
+        .cta-banner:hover { background: #1ebe5b; }
+
         /* Navigation Tabs */
         .tabs { display: flex; gap: 6px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
         .tab-btn { flex: 1; min-width: 140px; padding: 10px; border: none; background: #e2e8f0; color: #334155; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; text-align: center; }
@@ -57,6 +61,42 @@
         .cards-container { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
         .card-row-two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         @media (max-width: 500px) { .card-row-two { grid-template-columns: 1fr; } }
+
+        /* ===== Mobile Optimization (covers ~95% phones, portrait 9:16 screens ~360-430px) ===== */
+        @media (max-width: 480px) {
+            body { padding: 8px; }
+            .container { padding: 12px; border-radius: 10px; }
+            .brand-left h1 { font-size: 16px; }
+            .brand-left p { font-size: 11px; }
+            .brand-right { font-size: 11px; line-height: 1.5; }
+            .client-bar { padding: 8px 10px; gap: 8px; flex-direction: column; }
+            .client-bar .field { max-width: 100% !important; }
+            .cta-banner { font-size: 12px; padding: 10px 12px; line-height: 1.4; }
+            .tabs { gap: 4px; }
+            .tab-btn { min-width: 108px; font-size: 10.5px; padding: 8px 5px; }
+            .input-group label { font-size: 11px; }
+            /* Prevent iOS Safari auto-zoom on input focus (needs >=16px) */
+            input, select { font-size: 16px !important; padding: 9px 8px; }
+            .yellow-card { padding: 12px; }
+            .yellow-card .title { font-size: 12px; }
+            .yellow-card .value { font-size: 15px; }
+            .blue-card { padding: 12px; }
+            .blue-card .title { font-size: 12px; }
+            .blue-card .value { font-size: 17px; }
+            .chart-box-wrapper { padding: 15px 10px; }
+            .bars-container { padding-left: 8px; padding-right: 8px; }
+            .bar-wrapper { width: 78px; }
+            .bar-body { width: 38px; }
+            .bar-val-top { font-size: 10.5px; }
+            .bar-x-label { font-size: 9.5px; }
+            .y-axis { width: 34px; font-size: 9.5px; padding-right: 4px; }
+            .chart-legend { gap: 14px; font-size: 10.5px; flex-wrap: wrap; }
+            .table-title { font-size: 12px; }
+            table { font-size: 10.5px; }
+            th, td { padding: 6px 6px; }
+            .btn-pdf { font-size: 13px; padding: 11px; }
+            .disclaimer { font-size: 9px; }
+        }
 
         .yellow-card { background-color: var(--yellow-bg); border: 1px solid var(--yellow-border); border-radius: 12px; padding: 15px; text-align: center; }
         .yellow-card .title { font-size: 13px; font-weight: 700; color: #555; margin-bottom: 6px; }
@@ -118,6 +158,7 @@
             body { background: white; padding: 0; }
             .container { box-shadow: none; border: none; max-width: 100%; }
             .tabs, .btn-pdf { display: none !important; }
+            .cta-banner { display: none !important; }
             .calc-form.active { display: block !important; }
             input, select { border: none !important; background: transparent !important; font-weight: bold; }
         }
@@ -151,12 +192,19 @@
         </div>
     </div>
 
+    <!-- WhatsApp CTA Banner -->
+    <a href="https://wa.me/918087126804?text=Namaste%20Valmik%20Sir%2C%20mala%20SIP%20planning%20(Wealth%20Creation%2FRetirement%2FChildren%20Education)%20baddal%20mahiti%20have%20aahe."
+       target="_blank" class="cta-banner">
+        💬 Wealth Creation, Retirement Income, मुलांचं शिक्षण व लग्न — मोफत SIP सल्ल्यासाठी WhatsApp करा
+    </a>
+
     <!-- Navigation Tabs -->
     <div class="tabs">
         <button class="tab-btn active" onclick="switchTab(event, 'calc1')">1. Normal SIP</button>
         <button class="tab-btn" onclick="switchTab(event, 'calc2')">2. Step-Up vs Normal</button>
         <button class="tab-btn" onclick="switchTab(event, 'calc3')">3. SIP + Inflation</button>
         <button class="tab-btn" onclick="switchTab(event, 'calc4')">4. Step-Up + Inflation</button>
+        <button class="tab-btn" onclick="switchTab(event, 'calc5')">5. Goal Cost Calculator</button>
     </div>
 
     <!-- CALC 1: Normal SIP -->
@@ -261,8 +309,44 @@
         </div>
     </div>
 
+    <!-- CALC 5: Goal Cost Calculator (Inflation Impact on a Goal) -->
+    <div id="calc5" class="calc-form">
+        <div class="form-grid">
+            <div class="input-group">
+                <label>ध्येयाची आजची किंमत (₹) / Goal's Current Cost:</label>
+                <input type="number" id="c5_p" value="500000" oninput="runAll()">
+            </div>
+            <div class="input-group">
+                <label>अपेक्षित महागाई दर (% Inflation):</label>
+                <input type="number" id="c5_inf" value="7" step="0.5" oninput="runAll()">
+            </div>
+            <div class="input-group">
+                <label>कालावधी (वर्षे):</label>
+                <input type="number" id="c5_n" value="15" oninput="runAll()">
+            </div>
+        </div>
+    </div>
+
+    <!-- Goal Cost Calculator Summary Cards -->
+    <div id="goalcost_cards_block" style="display: none;">
+        <div class="card-row-two">
+            <div class="yellow-card">
+                <div class="title">आजची किंमत (Current Value)</div>
+                <div class="value" id="disp_goal_current">Rs. 0</div>
+            </div>
+            <div class="yellow-card">
+                <div class="title">महागाईमुळे वाढ (Inflation Impact)</div>
+                <div class="value" id="disp_goal_increase">Rs. 0</div>
+            </div>
+        </div>
+        <div class="blue-card" style="margin-top: 10px;">
+            <div class="title">भविष्यातील किंमत (Future Cost of this Goal)</div>
+            <div class="value" id="disp_goal_future">Rs. 0</div>
+        </div>
+    </div>
+
     <!-- Summary Cards Section -->
-    <div class="cards-container">
+    <div class="cards-container" id="normal_cards_block">
         <!-- Normal SIP Summary Cards -->
         <div class="card-row-two">
             <div class="yellow-card">
@@ -325,7 +409,7 @@
                     <div class="bar-track">
                         <div class="bar-body bg-green" id="bar1_shape" style="height: 34%;"></div>
                     </div>
-                    <div class="bar-x-label">Invested Amount</div>
+                    <div class="bar-x-label" id="bar1_label_text">Invested Amount</div>
                 </div>
 
                 <!-- Bar 2: Total Value -->
@@ -334,7 +418,7 @@
                     <div class="bar-track">
                         <div class="bar-body bg-orange" id="bar2_shape" style="height: 100%;"></div>
                     </div>
-                    <div class="bar-x-label">Total Value</div>
+                    <div class="bar-x-label" id="bar2_label_text">Total Value</div>
                 </div>
             </div>
         </div>
@@ -343,17 +427,17 @@
         <div class="chart-legend">
             <div class="legend-item">
                 <span class="dot" style="background: #00bfa5;"></span>
-                <span>Invested Amount: <strong id="legend_inv_val">₹6.87 Lakh</strong></span>
+                <span><span id="legend_inv_label">Invested Amount</span>: <strong id="legend_inv_val">₹6.87 Lakh</strong></span>
             </div>
             <div class="legend-item">
                 <span class="dot" style="background: #f5a623;"></span>
-                <span>Total Value (with Step-Up): <strong id="legend_fv_val">₹19.89 Lakh</strong></span>
+                <span><span id="legend_fv_label">Total Value (with Step-Up)</span>: <strong id="legend_fv_val">₹19.89 Lakh</strong></span>
             </div>
         </div>
     </div>
 
     <!-- Yearwise Breakdown Table -->
-    <div class="table-container">
+    <div class="table-container" id="sip_table_container">
         <div class="table-title">SIP Calculator Step Up Amount Invested Summary</div>
         <table>
             <thead>
@@ -422,10 +506,29 @@
         document.getElementById(calcId).classList.add("active");
         evt.currentTarget.classList.add("active");
 
-        if (calcId === 'calc1' || calcId === 'calc3') {
-            document.getElementById('stepup_cards_block').style.display = 'none';
+        if (calcId === 'calc5') {
+            // Goal Cost Calculator: hide SIP cards + year-wise table, show goal cards, relabel chart
+            document.getElementById('normal_cards_block').style.display = 'none';
+            document.getElementById('goalcost_cards_block').style.display = 'block';
+            document.getElementById('sip_table_container').style.display = 'none';
+            document.getElementById('bar1_label_text').innerText = 'आजची किंमत';
+            document.getElementById('bar2_label_text').innerText = 'भविष्यातील किंमत';
+            document.getElementById('legend_inv_label').innerText = 'आजची किंमत';
+            document.getElementById('legend_fv_label').innerText = 'भविष्यातील किंमत';
         } else {
-            document.getElementById('stepup_cards_block').style.display = 'block';
+            document.getElementById('normal_cards_block').style.display = 'flex';
+            document.getElementById('goalcost_cards_block').style.display = 'none';
+            document.getElementById('sip_table_container').style.display = 'block';
+            document.getElementById('bar1_label_text').innerText = 'Invested Amount';
+            document.getElementById('bar2_label_text').innerText = 'Total Value';
+            document.getElementById('legend_inv_label').innerText = 'Invested Amount';
+            document.getElementById('legend_fv_label').innerText = 'Total Value (with Step-Up)';
+
+            if (calcId === 'calc1' || calcId === 'calc3') {
+                document.getElementById('stepup_cards_block').style.display = 'none';
+            } else {
+                document.getElementById('stepup_cards_block').style.display = 'block';
+            }
         }
 
         runAll();
@@ -438,6 +541,7 @@
         else if (activeTab === 'calc2') runCalc2();
         else if (activeTab === 'calc3') runCalc3();
         else if (activeTab === 'calc4') runCalc4();
+        else if (activeTab === 'calc5') runCalc5();
     }
 
     // Matches MFSH (Mutual Funds Sahi Hai / AMFI) official Step-Up SIP calculator formula
@@ -570,6 +674,22 @@
 
         updateChart(stepRes.totalInv, stepRes.fv);
         renderTable(stepRes.tableData);
+    }
+
+    // CALC 5: Goal Cost Calculator (matches MFSH Inflation Calculator formula exactly)
+    function runCalc5() {
+        let p = parseFloat(document.getElementById('c5_p').value) || 0;
+        let inf = parseFloat(document.getElementById('c5_inf').value) || 0;
+        let years = parseInt(document.getElementById('c5_n').value) || 0;
+
+        let futureCost = p * Math.pow(1 + (inf / 100), years);
+        let increase = futureCost - p;
+
+        document.getElementById('disp_goal_current').innerText = fmtRs(p);
+        document.getElementById('disp_goal_increase').innerText = fmtRs(increase);
+        document.getElementById('disp_goal_future').innerText = fmtRs(futureCost);
+
+        updateChart(p, futureCost);
     }
 
     // Robust Bar Chart Updater
