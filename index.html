@@ -757,11 +757,15 @@
         if (tabs) tabs.style.display = 'none';
         btn.style.display = 'none';
 
+        // महत्त्वाचं: page स्क्रोल केलेली असेल तर html2canvas ती रिकामी जागा
+        // PDF च्या पहिल्या पानावर धरतो (blank page 1 bug). त्यामुळे आधी scroll top ला आणतो.
+        window.scrollTo(0, 0);
+
         let opt = {
             margin:       8,
             filename:     fileName,
             image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2, useCORS: true },
+            html2canvas:  { scale: 2, useCORS: true, scrollX: 0, scrollY: 0, windowWidth: document.documentElement.scrollWidth },
             jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
 
