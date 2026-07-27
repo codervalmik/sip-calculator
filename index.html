@@ -150,7 +150,7 @@
         /* Print Button */
         .btn-pdf { width: 100%; background: var(--secondary); color: white; border: none; padding: 12px; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 20px; }
         .btn-share { width: 100%; background: #075E54; color: white; border: none; padding: 13px; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 20px; }
-        .btn-share:disabled { opacity: 0.6; cursor: wait; }
+        .btn-share:disabled, .btn-pdf:disabled { opacity: 0.6; cursor: wait; }
 
         /* Regulatory Disclaimer */
         .disclaimer { font-size: 10px; color: #64748b; text-align: justify; margin-top: 20px; border-top: 1px solid #e2e8f0; padding-top: 10px; line-height: 1.5; }
@@ -461,8 +461,9 @@
         </table>
     </div>
 
-    <!-- Action Button -->
-    <button class="btn-share" id="shareBtn" onclick="shareOrDownloadPDF()">📤 PDF तयार करून थेट Share करा (WhatsApp/Email)</button>
+    <!-- Action Buttons -->
+    <button class="btn-share" id="shareBtn" onclick="shareOrDownloadPDF()">📤 PDF Share करा (WhatsApp/Email)</button>
+    <button class="btn-pdf" id="downloadBtn" onclick="downloadPDFOnly()">📥 PDF Download करा</button>
 
     <!-- Regulatory Disclaimer -->
     <div class="disclaimer">
@@ -742,20 +743,16 @@
     }
 
     // One-click: generate PDF and open native mobile Share sheet (WhatsApp/Email/etc.)
-    async function shareOrDownloadPDF() {
-        let clientName = document.getElementById('clientName').value.trim() || 'Client';
-        let fileName = `SIP_Plan_${clientName}.pdf`;
+    // Common helper: hides UI chrome, resets scroll (fixes blank-page-1 bug), builds PDF blob
+    async function generatePdfBlob(fileName) {
         let element = document.querySelector('.container');
-
-        let btn = document.getElementById('shareBtn');
-        let originalText = btn.innerText;
-        btn.innerText = '⏳ PDF तयार होत आहे... थांबा';
-        btn.disabled = true;
-
-        // PDF तयार करताना बटणे आणि टॅब लपवणे
         let tabs = document.querySelector('.tabs');
+        let shareBtnEl = document.getElementById('shareBtn');
+        let downloadBtnEl = document.getElementById('downloadBtn');
+
         if (tabs) tabs.style.display = 'none';
-        btn.style.display = 'none';
+        if (shareBtnEl) shareBtnEl.style.display = 'none';
+        if (downloadBtnEl) downloadBtnEl.style.display = 'none';
 
         // महत्त्वाचं: page स्क्रोल केलेली असेल तर html2canvas ती रिकामी जागा
         // PDF च्या पहिल्या पानावर धरतो (blank page 1 bug). त्यामुळे आधी scroll top ला आणतो.
@@ -770,17 +767,39 @@
         };
 
         try {
-            // 1. PDF तयार करणे (outputPdf is the correct html2pdf.js Worker method for 'blob')
-            let pdfBlob = await html2pdf().set(opt).from(element).outputPdf('blob');
-
-            // 2. बटणे पूर्ववत दाखवणे
+            // outputPdf is the correct html2pdf.js Worker method for 'blob'
+            return await html2pdf().set(opt).from(element).outputPdf('blob');
+        } finally {
             if (tabs) tabs.style.display = 'flex';
-            btn.style.display = 'block';
+            if (shareBtnEl) shareBtnEl.style.display = 'block';
+            if (downloadBtnEl) downloadBtnEl.style.display = 'block';
+        }
+    }
 
-            // 3. Blob फाईल तयार करणे
+    function triggerBrowserDownload(pdfBlob, fileName) {
+        let a = document.createElement('a');
+        a.href = URL.createObjectURL(pdfBlob);
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(a.href);
+    }
+
+    // Button 1: Share via native Share sheet (WhatsApp/Email); falls back to download if unsupported
+    async function shareOrDownloadPDF() {
+        let clientName = document.getElementById('clientName').value.trim() || 'Client';
+        let fileName = `SIP_Plan_${clientName}.pdf`;
+
+        let btn = document.getElementById('shareBtn');
+        let originalText = btn.innerText;
+        btn.innerText = '⏳ PDF तयार होत आहे... थांबा';
+        btn.disabled = true;
+
+        try {
+            let pdfBlob = await generatePdfBlob(fileName);
             let file = new File([pdfBlob], fileName, { type: 'application/pdf' });
 
-            // 4. मोबाईलवर डायरेक्ट WhatsApp Share पर्याय उघडणे
             if (navigator.canShare && navigator.canShare({ files: [file] })) {
                 await navigator.share({
                     files: [file],
@@ -788,16 +807,33 @@
                     text: `नमस्कार ${clientName}, आपला SIP गुंतवणूक प्लॅनिंग रिपोर्ट सोबत पाठवत आहे.`
                 });
             } else {
-                // लॅपटॉप किंवा इतर ब्राऊझरसाठी थेट डाऊनलोड फाईल
-                let a = document.createElement('a');
-                a.href = URL.createObjectURL(pdfBlob);
-                a.download = fileName;
-                a.click();
+                // लॅपटॉप किंवा file-share न होणाऱ्या ब्राऊझरसाठी थेट डाऊनलोड
+                triggerBrowserDownload(pdfBlob, fileName);
             }
         } catch (error) {
-            if (tabs) tabs.style.display = 'flex';
-            btn.style.display = 'block';
             console.log("Sharing cancelled or error", error);
+        } finally {
+            btn.innerText = originalText;
+            btn.disabled = false;
+        }
+    }
+
+    // Button 2: Always downloads the PDF directly (no share sheet) - for laptop/desktop use
+    async function downloadPDFOnly() {
+        let clientName = document.getElementById('clientName').value.trim() || 'Client';
+        let fileName = `SIP_Plan_${clientName}.pdf`;
+
+        let btn = document.getElementById('downloadBtn');
+        let originalText = btn.innerText;
+        btn.innerText = '⏳ PDF तयार होत आहे... थांबा';
+        btn.disabled = true;
+
+        try {
+            let pdfBlob = await generatePdfBlob(fileName);
+            triggerBrowserDownload(pdfBlob, fileName);
+        } catch (error) {
+            console.log("Download error", error);
+            alert('PDF तयार करताना अडचण आली, कृपया पुन्हा प्रयत्न करा.');
         } finally {
             btn.innerText = originalText;
             btn.disabled = false;
