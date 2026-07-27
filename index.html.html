@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIP Calculator - Valmik Dagu Ugale</title>
+    <link rel="manifest" href="manifest.json">
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --secondary: #0d9488;
+            --yellow-bg: #fffde7;
+            --yellow-border: #fff59d;
+            --yellow-text: #e65100;
+            --blue-bg: #e1f5fe;
+            --blue-border: #b3e5fc;
+            --blue-text: #1565c0;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #0f172a;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+        body { background-color: var(--bg); color: var(--text); padding: 15px; }
+        .container { max-width: 950px; margin: 0 auto; background: var(--card); border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+
+        /* Header / Branding */
+        .brand-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--primary); padding-bottom: 12px; margin-bottom: 15px; }
+        .brand-left { display: flex; align-items: center; gap: 12px; }
+        .brand-logo { height: 58px; width: auto; flex-shrink: 0; }
+        .brand-left h1 { font-size: 20px; color: var(--primary); font-weight: bold; }
+        .brand-left p { font-size: 13px; color: #475569; font-weight: 600; margin-top: 2px; }
+        .brand-right { text-align: right; font-size: 12px; color: #334155; line-height: 1.4; }
+
+        /* Client Info Bar */
+        .client-bar { display: flex; gap: 15px; background: #f1f5f9; padding: 10px 15px; border-radius: 8px; margin-bottom: 20px; }
+        .client-bar .field { flex: 1; }
+        .client-bar label { font-size: 12px; font-weight: bold; color: #475569; display: block; margin-bottom: 4px; }
+        .client-bar input { width: 100%; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 13px; font-weight: 600; }
+
+        /* WhatsApp CTA Banner */
+        .cta-banner { display: flex; align-items: center; justify-content: center; gap: 8px; background: #25D366; color: white; text-decoration: none; padding: 12px 15px; border-radius: 8px; margin-bottom: 20px; font-size: 13px; font-weight: 700; text-align: center; box-shadow: 0 2px 6px rgba(37,211,102,0.35); }
+        .cta-banner:hover { background: #1ebe5b; }
+
+        /* Navigation Tabs */
+        .tabs { display: flex; gap: 6px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
+        .tab-btn { flex: 1; min-width: 140px; padding: 10px; border: none; background: #e2e8f0; color: #334155; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; text-align: center; }
+        .tab-btn.active { background: var(--primary); color: white; }
+
+        /* Input Form Grid */
+        .calc-form { display: none; }
+        .calc-form.active { display: block; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        @media (max-width: 650px) { .form-grid { grid-template-columns: 1fr; } .brand-header { flex-direction: column; text-align: center; gap: 10px; } .brand-left { flex-direction: column; } .brand-right { text-align: center; } }
+        
+        .input-group { margin-bottom: 10px; }
+        .input-group label { font-size: 12px; font-weight: bold; color: #334155; display: block; margin-bottom: 4px; }
+        .input-group input, .input-group select { width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; }
+        
+        .radio-group { display: flex; gap: 15px; margin-top: 5px; font-size: 12px; font-weight: bold; }
+        .radio-group label { display: flex; align-items: center; gap: 4px; cursor: pointer; }
+
+        /* Summary Cards Section */
+        .cards-container { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
+        .card-row-two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        @media (max-width: 500px) { .card-row-two { grid-template-columns: 1fr; } }
+
+        /* ===== Mobile Optimization (covers ~95% phones, portrait 9:16 screens ~360-430px) ===== */
+        @media (max-width: 480px) {
+            body { padding: 8px; }
+            .container { padding: 12px; border-radius: 10px; }
+            .brand-left h1 { font-size: 16px; }
+            .brand-logo { height: 44px; }
+            .brand-left p { font-size: 11px; }
+            .brand-right { font-size: 11px; line-height: 1.5; }
+            .client-bar { padding: 8px 10px; gap: 8px; flex-direction: column; }
+            .client-bar .field { max-width: 100% !important; }
+            .cta-banner { font-size: 12px; padding: 10px 12px; line-height: 1.4; }
+            .tabs { gap: 4px; }
+            .tab-btn { min-width: 108px; font-size: 10.5px; padding: 8px 5px; }
+            .input-group label { font-size: 11px; }
+            /* Prevent iOS Safari auto-zoom on input focus (needs >=16px) */
+            input, select { font-size: 16px !important; padding: 9px 8px; }
+            .yellow-card { padding: 12px; }
+            .yellow-card .title { font-size: 12px; }
+            .yellow-card .value { font-size: 15px; }
+            .blue-card { padding: 12px; }
+            .blue-card .title { font-size: 12px; }
+            .blue-card .value { font-size: 17px; }
+            .chart-box-wrapper { padding: 15px 10px; }
+            .bars-container { padding-left: 8px; padding-right: 8px; }
+            .bar-wrapper { width: 78px; }
+            .bar-body { width: 38px; }
+            .bar-val-top { font-size: 10.5px; }
+            .bar-x-label { font-size: 9.5px; }
+            .y-axis { width: 34px; font-size: 9.5px; padding-right: 4px; }
+            .chart-legend { gap: 14px; font-size: 10.5px; flex-wrap: wrap; }
+            .table-title { font-size: 12px; }
+            table { font-size: 10.5px; }
+            th, td { padding: 6px 6px; }
+            .btn-pdf { font-size: 13px; padding: 11px; }
+            .disclaimer { font-size: 9px; }
+        }
+
+        .yellow-card { background-color: var(--yellow-bg); border: 1px solid var(--yellow-border); border-radius: 12px; padding: 15px; text-align: center; }
+        .yellow-card .title { font-size: 13px; font-weight: 700; color: #555; margin-bottom: 6px; }
+        .yellow-card .value { font-size: 18px; font-weight: 800; color: var(--yellow-text); }
+
+        .blue-card { background-color: var(--blue-bg); border: 1px solid var(--blue-border); border-radius: 12px; padding: 15px; text-align: center; }
+        .blue-card .title { font-size: 13px; font-weight: 700; color: #333; margin-bottom: 6px; }
+        .blue-card .value { font-size: 20px; font-weight: 800; color: var(--blue-text); }
+
+        /* Fixed Image-4 Style Visual Bar Chart Box */
+        .chart-box-wrapper { background: #f4f5f7; border-radius: 16px; padding: 25px 20px; margin-top: 20px; border: 1px solid #e5e7eb; }
+        .chart-main-area { display: flex; height: 180px; position: relative; }
+        
+        /* Y-Axis Styling */
+        .y-axis { display: flex; flex-direction: column; justify-content: space-between; width: 45px; font-size: 11px; color: #6b7280; font-weight: 600; text-align: right; padding-right: 8px; border-right: 2px solid #cbd5e1; height: 140px; margin-top: 22px; }
+        
+        /* Chart Canvas Area */
+        .bars-container { flex: 1; display: flex; justify-content: space-around; align-items: flex-end; position: relative; padding-left: 20px; padding-right: 20px; height: 180px; }
+        .grid-line { position: absolute; left: 0; right: 0; border-top: 1px dashed #e5e7eb; width: 100%; pointer-events: none; }
+        
+        .bar-wrapper { display: flex; flex-direction: column; align-items: center; width: 100px; z-index: 2; }
+        .bar-val-top { font-size: 12px; font-weight: 800; margin-bottom: 6px; text-align: center; white-space: nowrap; }
+        .bar-val-green { color: #00bfa5; }
+        .bar-val-orange { color: #f5a623; }
+        
+        /* Fixed Track for Bars */
+        .bar-track { width: 100%; height: 130px; display: flex; align-items: flex-end; justify-content: center; }
+        .bar-body { width: 50px; border-radius: 8px 8px 0 0; transition: height 0.4s ease; min-height: 4px; }
+        .bg-green { background-color: #00bfa5; }
+        .bg-orange { background-color: #f5a623; }
+        
+        .bar-x-label { font-size: 11px; font-weight: 700; color: #4b5563; margin-top: 8px; text-align: center; }
+
+        /* Bottom Legend */
+        .chart-legend { display: flex; justify-content: center; gap: 30px; margin-top: 15px; font-size: 12px; font-weight: 700; }
+        .legend-item { display: flex; align-items: center; gap: 8px; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+
+        /* Yearwise Breakdown Table */
+        .table-container { margin-top: 25px; overflow-x: auto; }
+        .table-title { font-size: 14px; font-weight: bold; color: #334155; margin-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: right; }
+        th, td { padding: 9px 12px; border-bottom: 1px solid #eee; }
+        th { background: #fff3e0; color: #d84315; font-weight: bold; text-align: right; }
+        th:first-child, td:first-child { text-align: left; }
+
+        /* Print Button */
+        .btn-pdf { width: 100%; background: var(--secondary); color: white; border: none; padding: 12px; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 20px; }
+
+        /* Regulatory Disclaimer */
+        .disclaimer { font-size: 10px; color: #64748b; text-align: justify; margin-top: 20px; border-top: 1px solid #e2e8f0; padding-top: 10px; line-height: 1.5; }
+
+        @media print {
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; border: none; max-width: 100%; }
+            .tabs, .btn-pdf { display: none !important; }
+            .calc-form.active { display: block !important; }
+            input, select { border: none !important; background: transparent !important; font-weight: bold; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Branding Header -->
+    <div class="brand-header">
+        <div class="brand-left">
+            <img src="data:image/webp;base64,UklGRt4gAABXRUJQVlA4INIgAAAwcwCdASrwAPAAPjEWiUOiISETW21AIAMEpu5KgXI1zmTV+O7E7c3qf7h+0ns72N+//jD+t+6r+q9uHX3lt80f8b+2eof/j/3X3RfoD/f+4B+n3+0/svrb/sB7rv7d/2PUH/Q/7d/5f8B70Xoo/vXqB/3L/I//fsGv3P9gbzdP+X+5Pwf/2L/i/uP8DH7A//32AP//6gH//63fpP/S/xV8Av7r/Xf1+/dz1j/E/mf7P/ZP2Q/rn/o/13wP/x3jL6n8zP419d/wf97/bL81vjz/F/k9+IHtX8K/7P1Bfxb+Qf3X+vfsr+V/zofPdwfY7/YeoR66fQf8J/hf2y/y3Od9cv8T9vX2A/z7+uf4n+5/uj/hP//0O3qXsAfy/+q/7f+1/ul/wfpa/jf+X/m/85+zftl/Lf8H/wf8Z/pf2t+wf+R/0T/T/3D/P/+P/Mf///1/eb7LP2K9kr9jf/KWxOGSOmF3hSsS3vyEVwJb35CKx1RSQPbikBWKnyEVwJQ6yBc1XRjRITCZOCDAKH9zDelZEuclDYNnduhe7WBwxBdG/IgxO7PhFcCUWx8COQ65pyshZBEB0epVRXWylr9MgjoCsDCxBGGtM8MD3FZG/lQNbbp6EnOjyB4rU0cPn4b7bEPqVUVXCV5f5gU2keW15ev/3KwHjK5A0Of7Xd9nPgp7+lN4Lt0R2XmFgpvgE+GA5NFXpHzbRHq9Y8OmTdjc8YtAZKvN5h2uEJPMRAL5/97KdfWS7NuFwrw3gJelNm5pj02i4HdgleAnvw6/vxVH7el//XfEtgzP8fKDqFq/QPW80TyqpQAnr6VDfVwyQAruEoQltytv3TgwkpNORF7LC8orXrVqjUKa1F7AKhGp7dpvfkEvyE4w/8OTv+LGIbOZO4roT1zVlzXrzvg08l+Eohb3y944C27TGV77Dn0fBjC+L1oBb3pGdkZVJalwoK1yMwBQ52CZ9rN1aBLsccrNH0/OTW6TKuOV56AREvfz3+Ut/zlF9wFkDezDVlpViAiMVWVzCI3Uz1HVFmWmBGGM0yFiQO/Xr/C2MBxyf8w7QQVCR/d03nUbeupnIEILbpKpCYdIQB4i8wJO1uK1+tsRN3jou4IVaRGn2lQKZhz7cP/ZGBMt3oL0EHWeR1FyQSL9kYFPv3AV2vB9kDPnEwKxXPqB15rHAHp6OvzW5iLTlOh0slEl3NHTnFtLjaBYVsGGiiAqBZQ8JdnC9cKViW9+QiuBJgAA/v/OqAAAJTuwGy1yQBcblLLnhNipW6y2PEvW3Qq99uUJpljij4z/w044J9iXHXXwKxDLu/WLS5X/Xvuxpi0kZnLmyLzGb8QD07+32r6rlNltCd8Jk0UxGg4kFp9x9CyCZjHaJxEW0gib4dhoHCly3i0GKYapQ4dNRxBj7qtqHxMX0QyeF30zG218ORjq2BUynu8BNLN/Jyv+ql4BpSDeIM9CceDq/wQr+HjCl4cT7WhD8YahlymS2mn9BPayqWDmkEnrXrHxFs/MtY+3NicDma6HcsDJjMgC7dMASb2K0MJx5v+DjLjNBKB3MW80WN/G1aMXNEE3JEpzhCrVpN7CjXXKzkO2KQawlnn+Z28KGxSAIXcLxdMfM8LsBKlPFgICMUc5jtLILG99oV5ilM4iSU895hsF7SBIT2g7ZQc4dXjWI7DtX8bQWRAnVf8CCNm5qjTnnHJz2XjHXi48nYTkybA/8nvld9T2Rho8yz14QFZEh2RQVqCo7sVAha0Rbx+fLJY6jy5hEGXb43P5Di63oqjNMdEPlzVDzac/HPoQvRWh5A+dD9xrcmglzAn25W2ZCumCUMLXZ6u1RCfbQ03hbhFOJUcrFZiBIFsSt+Zal6602YgvugPtU1hO09cD/4CwF56mLlPfPrEfSm2sJRZMvMalsi8Y3yJjDCMOHouHo+WQaMobptzhxPN6NBHpu1ML1hrEsvMYX4qtx6Gmn/3DpjrpofowN1puNJz9z8IVa+qmtsUIlidh2ZlC9SwKg1oX8LI85uR1wKovRohZkiXWarddbXKGPqChmV3Dfa7cDC6qVvUU2Q3E8yD1vk/AxG2j9VDZLVhi2aLdg/hzVo34u8Z3VBRJiFtcTMKDLz0iWZo0Bzn1xSmWuqAAe15Pnq/V+Jyi9/dnEvTns9ZCHceh8i6qMzvHXHUHKUdLKM2weT6GDJvAUnLy1mL1elnlNak9GPdJvzjgJiSfIbXBKciRS4jc85Qndw348S8BOLvYn3pG1NWFZIhRCTNnL2KVjIv9Adn9Q21zyTUIiSQoo15yNMJXazNtd5ROaOYK0sDLQ/CmtkZuom7Ek4Wn5wgIj1B1veUTUFfXSAtwVrOPKHoAltr+YbFgTZMLlUYjuQAJ15v8QhvTRbzOgmTkIhkBSt0vhu7DfAw7IoVqPJllVJtPqha9Io4gXrRk0eHghxMWnJaitr//DdB863+blhuRt7aicY8w6J8ovdgk1uYs8k29Li+Qg+eF97VmIhf2XGldpjjpfUzM7KRBK6jrlZk7R8y73fwRENz/F0Pdh2oLtOfNLoJ2IiWOR9RxArrqePp1AVBC/vLk1JaFsxWVCDJ8/tqpJZWQ1R3C9JPeItMaAtPb5JPN7RCQ5ud9T8bAqNWNNkgiUFpVjiK/FC/dAfWhmvvz6HzzEAKeOP0g00jZ8q+c/4g0c6dqYrCqQzFSR+J97kfqK6VROtjUR0/9Ov/wK1GMkfxbpHdOvitC3EZnvCzkT/d3v+1QD8phgESf+xpJGfWCzp88WzA/xPDgjrjGmxp5s/MrjtMaTjMpYe8xqjMYAs8gjxRccMALf+QrcU72fm+p7EAe/8cQHWWGCXw9HwgN6BbKe4wJv4/ArqAH9HYvcZ/mnMH+XONpTLGu3n7OoBDLiK/tjkf2CrLyIoOwef0jB0JQyajnpY1ysuV8sobYPKggP/WuIicMqD5yt1wvqARzSfmr5FMq3ue5EDGqv0XukIKfP/9pyc8wJbjN6euyVzZM5sIKnP5z3ypBqaJhl0ileSA+ZHpjVWKiPbp+ksns/z36TywoIiw+yA4S/rcN+kFF3pzTQYim9cD8OhUabPB4bs69W0nhblTfu45j1lJ2baJAjaij4jTqGOdUs95iQkinUr2JPTfKYvSuZ4SBbAkLvGLNmo2mo5+ezik8fIP9flOxJXpbyDwCO2SwVinJtUtkQEL/E0zaX5BSVaklKZ4auv7xRWWOT4mkO0bnOvE9FqUfC8ieQgz5e/W2UIKxVQ1F6gKINpLPmrTt7K/24rl+NsrXBmcEQztiX27UMIJsdTmRQPo9qyKL3+knqfIvHAAWgZMpTq24XemlouMlWy49y7ZJR1qVLhYynrodzOSo/zaHmXxeKyd7e+JEXsUjylQhp1UyAQ6I5rO3Mfy6Pex+XYdqcXA1dxOQ5FW2fcbQS+2pKlXNpT5U0ESquAizqhehSpW/S/8OuwWefJU25QR6K9fIhf0BDRGcDQ6NFaHiTbCpcAKqozEans5nDoxcDmaxtsrfxbT3L8JhJxgxMuGYzLzhamG5HQDO4K3bN8swZ2PGxlbCTuHohTLABWln/wje4lbAgReJw5jEjXBrVlMrX/2KWUlay5Hw9S9/BnjzKQf9w8VI5kIS9E5xRUgyDV0FVRfCiPGO0qtH1cYYYxreXzciIlsPVBRL3JqA7VZWUlNgjB6tmQl/UxiqoQjo45/OzJI3SYYOrvoijgoYhEvZRxT9b1IgO6oxH06O6cocZ8n+N/1dbUL+m0w6RylIZW9RW/jkPsxwYCNYFn+wFicoFxAyAF92KrYnLgWx4dJ4birbyDgyOgXSMjnX2HxAdaDcNh3OpQifYgs43+IhtcGVW/nW0xY7Rh3MIC6+/jzO9eZ0weIvjn0XTagrHIzlOfdAxEQrULVKQV9N8hnODF/ZlrKCqDg9tzfR1f8Ooyxj0l/C6V71hces4fV3+cyhul9hF00W1Q8uGdsmh8eDETSC6kvw1YAACxQtc+zrCRGA4xI3sDWwaO4XRr1DYlVgy/qab0nxkg6c6Veol8ecWiRH+ct+OI7xTtDYPUDJCsTizGSrZmvCt3niG64pUScXby/Mjm8o1XEl+33TPLjZuhfH3J6ya/nCDSc1adVavLvN2ISfxVMMp2+0GqDiEvvwgkw9Opq0MxGBt+Bps7f7jdILzEmBHaURhwHkNY3rSC9zMpDOoJ4hBBb98V2rf3Pv0aYQ15DN5kf9lijtGNMpsdm1k4P88hQMca+oBIV55fgYS82Uwk7z06o6NSVHP2I94WZyNIQ1JUgEnssBWR7pckWfI9p+J1Tq8Ewpc/9EAr/i5wWlaBx+BZ4AKFRklKXb8Ix2mURn9O3O7/BVZJJaHjmPMHKbnz1vujs/RMWBtN8GApzmcQ+nsGhA105MHK3U786ci4mtijyn1NMQyGbeH5yjYxHYucxfohJv+fIsdaOYU07yPxGsPP834hlLJXb+o5ABsYIQVLuAk+iHEhivcsdejqTpDVzxnXno8SwUaJ/H8hlmvG/co0kRocUzEz36PipjLH3sLiGv4bHv7d+bJkwrrUKEvM9Ld/0VL2lxnBgllS9kkcz/xzxQMR59CfzUu+qvkyt1tWl0j6cTQ/+icl8thlbbrq/NPLX5FYDp+9jT0vtBOXhSGMX8Xyj2IJ+omjqRtExdVGnGihALoExBgwe0CCqXCTxGklI2G1EObCU4CBYq3PdFrtoAXIl3DFFI5bEsPW+6bpNTsNjOMm/AsD8WhDemHa42R6bBnH74p3mjcJYXDTAD7pVYOKK6q376xW+p6Cfbbr4Ah9JQU7rqJLSIOC6/xykwjDzdIlB2wYv3Va6p6lHWpukSvAB/uHJWg2rklHspeIX+Uji3YxGSOCjoqQAvPnSLqH3KTuXKg5/Klv9qs8gvVcNOhZqXUCOOBwHBu0b2ft3L+e3gSUiIMZXuuDbJxA9JEOPXZQJo5JDCd8W29OIInS2xtnq+TW6v8Uf8xQbDZor+bCHUwR7zPw4AW+SNVCJlorqVIfxbTPi9+UuM4BB5WtQ5mct/46f+gj0WlZyi/C0oJTawpa0B03TJmU+hCKWUDrRukW+CEjC/bdDVCZbK5oLRt1/PmszJkhT9AFif2xeJ/BojM0sQArH1HlktaY26Ya1yRbJdKckLfyr2ncDf7LbzM4M6I6r3xFZbvbwWoe4jOnpZgq/G0deD0FLMPrq3jgPZYuPFDvbnO+Yk9F72tL0m+o18fo/hBn7M8Exyxlf9f2z7wM+yrSTWrZlWEaZ6AmUIpvi/yQTbiLEcaIMB1tO+bwzWe1fvKX/cKOtLWHSJe8ESIPJc/tstjXHQ6wAnALKPeVcz5FL5ZvSi8ZMw1u3c3lYoNzyLsOnUGZ/Gf9hoDmkD6NafeIDa4PEJNLxV9pCeKFd4UP8fCJyvfl2ioP/tsitHtfQN2+no0X4b2cxWTXo61MAgBiIPnT1WK7KOc18E9w1t+oR9BiiIruyPNHHPTAzc2nZkgAgrF0pqAT8ZbQFKNELzTmOCTeDl8N6hprKU/11bQbgITs9aYu860c0D7wSRnDqNETwDB048kcVmdHAjxuCEseij2H4zULuDxxO/DxPKeraeYrSWapYVlGuzFkQTSIlklIqDYPjE0Ez5AYO/xRRf5Wg8GZ08dM+dRas1P/s9vgnz9FrzYjQB8y6mpqPyl+y88lfHhZXm/GV12DsHI+rST0WGQFxYLKVbM8tQV9UyLlVkQR3dr0Xib5qBkMII5MubcJlU5BQJWgPi9ETTVprz8P1MPVpkbrqE1epR4DtNsETk8ArLVzing8+sFnS4XtEMuIc5BAMTHPcTJSbDJ5A3Ware03E+AjJFa58IGb+zuTQwn3ts5t/5bTkXB3LShLmoTSJZKHz7nCdPgiDNWcJyRmmBW/Gi+ibRdosm1en9R0YQGb3zUU/uOie8mLHBpAKLkoIZ4PzBxcHqdoCYDSuDdAp7nmJDtJMm24MICDU+wk1rj7BhcxMfhwQm+bUPx5OnkjTCctpQmtp3w0yqDJTvz9zUCsVKeNUzUAg3KXywLlfquHbS4ofIJyOfymOw+NZzp1MXb0I8KIOXqZWI7QOKiTCpQ0pTDn/Jz9bcsZGWYNER47KSIGAYyglCDTUt/oqQH81vD9Sk+EenRswer7/yGeX77KyD3MVPLMjmNr1Pqr2fuuDl3U14tj+e6t6IS1HVuU5Z35B9SUiQcKTV9F8EK5CTKbFVWXc5kNqXPxIXxsD0duAWh63AMs3cNNbfiG5CtbYBaBNBh2kO6DmDWvuMBWr8iC4AE2uy5iijB00eEA7vz7T1A4e4CxY1SfcUftm0fytGbZjt1jtRvt5FSOdH2EjVTEmHTAzZ2KrzqJZjcv1A0qAGc6mhU5LBRLQ3dUeQFXyi5Zns6Odu6I3Mv9DEuNCYHtmEnyKx8Kz1lrjXGeM1mFY5Bzo34I6ZZtiwMqzeIfPPzQoNRrkQc1X9M1RwutHSaLKZEDw9qkOQZIScL83iqT/lrtZo0iQXuIApp0s2mUvAdrAdbywKMYb0M3FDpA0FY/ztYgXLVTqvUt3f1MzNX39hQOEsdAFzjCtj2jsCMLF6Gquaj4/uwgJYxYQxMhSMC1AFZlBK6FIX31xR74KOaUz7EtVgtk3t8VlBRrb9mt2S8Bgv7DXQkMr4QzN2PaDXqMQZCTIcqDeutP3BFaiPYey38ieUmGcfsmZ7YsFwdVaHy0QeUsiWnmdsFlyTJ2ToVcvanlkZuCOLqCk7ejeHcGEnK4rqPuOAQOwL6w5jhqiQkJF5B9PnGAVoBy2YR1c/6FJlPJil0thcMgsIVw3Y/+SQBdFuu693fLvLp8w1ktnICGDNoVXIa9nYSOXxQC2ykr9Ah/EP98c/vo1IiYzfSFgI0ThgUKTKF5PW2zzegX176iQx0x84Hq+O7Gob9KjVPOFOKHRz0s/Rzb3haAQU79/gNXF0Fp6A4/8gVsxYXq4jLOws/CAmozKLkjuatUZsX5R8raRX2ciRQXcV9qZhm9l0opVXKxCJh1njlgdTq2vUa41ABRQVtGark86yfyKAu2d3HqEJV2jwH7k/kyX+7vDVAKpy9frTFl+6Vy1i0CoxzszciVccuufxLYU364KAoMJEXT8qXO2FtUNBnviYGNTkKDf/toeiANPFislYhmaP+O97lZ/gKqrog/VTILovLoRUgyQ+Ylq4P15yelHEh2GjF8KFpJn+2mlNxcNdldfLMX51p+kJzapVH0vPWEvC2G+vF+d4THoWLuG0qeOdere/uEhrBRYlmGC6nNICKbdF180TilSQEkUyj5AdXRh7kUZJiWeiHHUbWDW3Mf87IN9qUJPhERxN+YYoveTNQWwWuNqdEQqKOndJzqSqSpDUqt58wHPxfAdeeVLEWOVuGwn0Rckji9pEIf+HnzFDnPRLyVRUeMtMrwbbF+UDLUtJmkV570mZPvLjLhdw3prXICKp/DP/MggRzU3B5pWNpStc+dmdXHc9NZ44xHCsDVbRu0gGqNVr1dfMv3GeHutd0ZrvwL1ViiKqXteLoO8BWRKtaaMAGtRlC7oeN/rCVhTgO5/igAkiZCwiEteFHZatrKKMr1l4Jd+0E9xocvyA0WyJf48mFzu4YZ3kncLUBv6VP+9AG/MBFpukzH1NP4V/1AnADUugDZUzooAefw6x4MHodHefazALeH6yA+8Y5LU86Qc/7UKJKUJ/8Pw7Uud9ny/quNbnSlw+OyjeTadj4klAFtwzq098YANyrhBzGpEgs3L8lYMNdXv3WgzcWcZALjlFRQY9hAVwvORA/UkSHjoj4MhbFCmy/ai1ZbD5OCSKXstHD4EvhRQPzLczudx9rkJ3yRH1pbrv04e6D8IFVJ6D79JhyjFHJZBKvjTYxiJXo5j7Zc+NZKbKXP3dUYX1cYSxlJ7Un34z734tylXlLHJD1p/J3FlF7w92qdoiUuGQqqzr/ue7S2LF4M8TN5YT7Wgx3gcqmpCMNEpP5YdpVPyzO+6LlhHBXTiQAfIxskO4WeYjf4UZJir8vuHrhFuN3vbhuyl8zYqaEC50+qqnbLZZbs1MjuJfHfF+s5yWtKzkuX7ett/y4qqdymnJYpbOGnOghuO9pwI5La2CiyC/9RLL2VePwGh4g+PpQr5HrjjTPBFt0GoQ5j88BKD0Ey/hGGPiE7Nhs7/ameXn0nz0OHEwCndIWWjNm70kTdF1RliEHKd1WwW2soWBNujzGXTc4QI8uCicVRbVOBRZhRrVi/++g1/XTHbcbRKZZYN3WozzBlV+ocm6/5hZRDoGRhRjEhtX5Eh0jEHIdFrBZkKzLqlmUoRlutrRo3L+wZMxd5R+2/wyzY8XipQjYn5/2dOTgCZ0SDepfZgOtHEGpuKvguTs5vZDGu1qcg28jy+u3/WkMmwY0JykM93Jtgo0DDl9yn7Nd4c5dq+OF0HuLr7l9CMUeszvxJP/MQnVXK1T53FCWMpBmfWvzVHwYm+JmPBa9rbGVBQ2/SCScCbFvGqi7qwDT8fplyFi/8/NEAdd2LpcilIvr1fOOzHjupVb5YE21ASpGkfBu9WfnXpm0kc5iDG3919xom1SR0V7QhP1hbHOuBuyoWT+9bz5t/6RX+i1K+ycpHto1idFmoMGjAnN1Hx4R4fCV3cSPr9iCUh9P08Nhf67z32ZKOU+hXeiJus7q6JmafJldfAzK759Fb/xQEkoICDN1OLQ9MZa5/PXPDMiEFza3y0itd28M0tl4ibvgzKoU+PyxzEjR6QsoUH7JAcdyieVLHQf/kJv+Rt49U9u+iNRHYrSsHJeQcVhqa0wTX9jwCnBhOF/yO7PMbHd6g4FgPBsOlqQWI/vFaAF/7ONsIkn32+jgEhnJrH1wSqcDLdHwB9VAkXIu69k0bkqCwYjfNWWuts/P9gFRWL8J3MdH8paACkne0+A+MXr4eQ0DpXxUARZ4xg4B8N5eus3HVbBxJB/4gGxghV9Sn25n9A27xeNj82Kuj6Z0A+tBMx2EkMxsJlyCil3hW5/yfwQ0iz/MVqrQu2K0fdvL7RdZhnCZplncJkPd+m2ET8GQGpByJNIgSolecdGGzJinEX3C/sst+AFKEPHz9gGcsWE7L843wHzpStrN3+ae4w7pQ66gLaF4WON7Ef+rr2W0nWBqo4z4JJlIxN4u/jbEGMlV6Qvz5iY1ZKTFN8DXGUY2qm5tg3u1T2xGT3T/Zny/OYOwiUxVcyOdvH/JXruw2JhcirE5nie5C+I+B8gFhaHfeo+OxgR2SK9Mp9NGTvnNT3WK9nSoDzXRZnZKLrauj9OBdYBOGL/jf7l3x6ex9VJAo6JVKzbBndbj2DQPnk/rcfygWTbN9P+US2g6Plik+VXfFn4FqB84zKJHm8qqQkpHByWlqMuQ54XqkpYoaxwal6UZ4NIgffII2pH5M0ZFxfs2h3NZ2FFy8xiBKpWMimKdStGU+yMCRSpZypXD+/6emiHlQAaIcKHEy4xUtBnk2NsYACirUN8g+LsqgACID0r7lsI18x8+FiwI1xhRVD/AMzx1XBsBhXefWgGaoZs5rWzXYT6459ivyaTW97i9KXspXQ5KjzUJb/IlMoHFaebmDLsJZr/GF8bWDYnwDlNQwQTyx6FOlLEZETvK9FoDcrKObMUwmGxS7UJ1x9Zug2aPDyHFM4Eqnil8mbAWHU6BkxblwRhR7pMKaRAVr0dv2YtO/vhPROdeRhKYolXC8QSAxQYNhGfImJf8gIggSqJlWozymQ8WJh1bdd12lTmBqe6ynLCV/j9vcioj/qqM/YcxyTQ/zkXj05q2H66v6wAqB6AV4Os8B2hesfUlLKMD8oDbWq6+aJem8cSGo2+uBajrj9Rr/IivGFXKSaGs98h9lfSt3d2SY+5OkgH+hhKMf+CEyT4tUyFTLNoqBPmOO7SRMBXBUNh2o9Alyv+poY+k1IhGvZd7A2mg+wOxyRdZD2C9EgCeKDZgLnTYWtSQMoPU1kgdy0U6LeSn6BlUlSerhO9lPhxHG7Upq88m0FBMSH2gn4dhsirnhyXdHY+C725SvLll0jYMvKF15BUrv/p+4V6jrZAZoUdZyRRsYcTq24Jme57TWvkGpXkcw6BjyJcTMqzdM/oe3gklj0qEPpwiP2InAcMKTi4Yn0kQ2f2BFqaMWLbbkAPo/omRgwhKguCoh2C2dmEK6J8lCGN+muOBiUbM+2WBbC2W4EScXsi4p5LMWzfQZtGYrC1ZE333sB25S24kZjNq98rvv2AswEBHRD2bXBRe+tJfN3Ezp3gjUZe0XwJf389Teww964HZe33M4DJ2lfdHA1/5cfwMcvD9fLNIeAldzihSgl2ibJ92JYSCKrgT/fr9UQPyOIha0sG6jEocpLnZus9Az2TL0CQFg5tIH0jtc3nK4hKN928Gcg5Lt8+JD0kvDfQs9AaqSUwEE366BPLucW/u4BxY7rsxizw+dxFUHaPWX4x/fASpsa/7OA6EOEQssBxkpXnbrpEdSWvP+Ok+8aD8r57DgbE8iMfegVYiYP7dmUDjbTrYg8jEliMysuN4SnlDPDSMg3MOb2qmefu6UPjSFnUg5taGJghR4bl7EBxGjn7s47rM+kC73YF6mDJStsMdI/0LRyMo0cei+CwAoiLuoAOaARIIYJcFizZQBccFCmPjDr8gOaNfJbA0c9dadYeXVlvIJh567tLdcrQ2CenzbYYRL4IL6yrKU6jXsCi5RF4KP1w/fY2zRmHxhU9vFlA3CH4I6jF6pJbLOBB4gq1Q5HGRuxF8qiRVMhPzwjJXnm8oYLg+ZWqZjH7oc76RDay0AWFiSSzFFUAH9aVhP3g3MuCNfZdQXkF3Jplbe8BQj3w/fBM3Xhg1s4XfNVjr13zuCkLN0zEJzSmhW5y5OamzHNSqLVvhcmfV8eUjGILTbogK6sXofiY0iP/afcnmUKLWIJOl7eDjmycsQhKgTWdgAxPsNIvuZVviZXNqmktlmvIafvM5O9DYI4LpFvNwG2lWpYyohfjS99ytrgcVlzn//l2v5t1Hoh/w87Azc8n7KmmtNY5riG2TF1H8j4YnZpoBvd+ZVvPbIQ7TOB3ZuvO4h61d7cSxHuoNZwu3/PjBxTiuOL2eNhOpHNwnyhQv/v5U9hBrklThqRgDf9irvoqn7AFcbKzQelP+ujK6oqesOgTImbubeACdejOrG+XDdqXMviSIHMhhg/AAAK8QK1G3PXMWOEAAAAAAA==" alt="Ethica Finserv" class="brand-logo">
+            <div>
+                <h1>Valmik Dagu Ugale | ARN-142382</h1>
+                <p>AMFI Registered Mutual Fund Distributor & SIF Distributor</p>
+            </div>
+        </div>
+        <div class="brand-right">
+            <div><strong>संपर्क:</strong> 8087126804</div>
+            <div><strong>ईमेल:</strong> valmikugale@gmail.com</div>
+            <div>नाशिक, महाराष्ट्र - 422003</div>
+        </div>
+    </div>
+
+    <!-- Client Info Bar -->
+    <div class="client-bar">
+        <div class="field">
+            <label>क्लायंटचे नाव (Client Name):</label>
+            <input type="text" id="clientName" placeholder="उदा. रुत्विक उगले">
+        </div>
+        <div class="field" style="max-width: 150px;">
+            <label>तारीख (Date):</label>
+            <input type="text" id="reportDate" readonly>
+        </div>
+    </div>
+
+    <!-- WhatsApp CTA Banner -->
+    <a href="https://wa.me/918087126804?text=Namaste%20Valmik%20Sir%2C%20mala%20SIP%20planning%20(Wealth%20Creation%2FRetirement%2FChildren%20Education)%20baddal%20mahiti%20have%20aahe."
+       target="_blank" class="cta-banner">
+        💰 संपत्ती निर्मिती | 🎓 मुलांचं शिक्षण-लग्न | 🏖️ निवृत्तीनंतर उत्पन्न - मोफत मार्गदर्शनासाठी कॉल / WhatsApp करा 👉 8087126804
+    </a>
+
+    <!-- Navigation Tabs -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab(event, 'calc1')">1. Normal SIP</button>
+        <button class="tab-btn" onclick="switchTab(event, 'calc2')">2. Step-Up vs Normal</button>
+        <button class="tab-btn" onclick="switchTab(event, 'calc3')">3. SIP + Inflation</button>
+        <button class="tab-btn" onclick="switchTab(event, 'calc4')">4. Step-Up + Inflation</button>
+        <button class="tab-btn" onclick="switchTab(event, 'calc5')">5. Goal Cost Calculator</button>
+    </div>
+
+    <!-- CALC 1: Normal SIP -->
+    <div id="calc1" class="calc-form active">
+        <div class="form-grid">
+            <div class="input-group">
+                <label>मासिक SIP रक्कम (₹):</label>
+                <input type="number" id="c1_p" value="1000" oninput="runAll()">
+            </div>
+            <div class="input-group">
+                <label>अपेक्षित परतावा दर (% प्रति वर्ष):</label>
+                <input type="number" id="c1_r" value="12" step="0.5" oninput="runAll()">
+            </div>
+            <div class="input-group">
+                <label>कालावधी (वर्षे):</label>
+                <input type="number" id="c1_n" value="20" oninput="runAll()">
+            </div>
+        </div>
+    </div>
+
+    <!-- CALC 2: Step-Up vs Normal Comparison -->
+    <div id="calc2" class="calc-form">
+        <div class="form-grid">
+            <div class="input-group">
+                <label>प्रारंभिक मासिक SIP रक्कम (₹):</label>
+                <input type="number" id="c2_p" value="1000" oninput="runAll()">
+            </div>
+            <div class="input-group">
+                <label>Step-Up चा प्रकार:</label>
+                <div class="radio-group">
+                    <label><input type="radio" name="c2_type" value="pct" checked onchange="runAll()"> टक्केवारी (%)</label>
+                    <label><input type="radio" name="c2_type" value="amt" onchange="runAll()"> रक्कम (₹ Amount)</label>
+                </div>
+            </div>
+            <div class="input-group">
+                <label id="c2_step_label">वार्षिक Step-Up (%):</label>
+                <input type="number" id="c2_step" value="10" oninput="runAll()">
+            </div>
+            <div class="input-group">
+                <label>अपेक्षित परतावा दर (% प्रति वर्ष):</label>
+                <input type="number" id="c2_r" value="12" step="0.5" oninput="runAll()">
+            </div>
+            <div class="input-group">
+                <label>कालावधी (वर्षे):</label>
+                <input type="number" id="c2_n" value="20" oninput="runAll()">
+            </div>
+        </div>
+    </div>
+
+    <!-- CALC 3: Normal SIP + Inflation -->
+    <div id="calc3" class="calc-form">
+        <div class="form-grid">
+            <div class="input-group">
+                <label>मासिक SIP रक्कम (₹):</label>
+                <input type="number" id="c3_p" value="1000" oninput="runAll()">
+            </div>
+            <div class="input-group">
+                <label>अपेक्षित परतावा दर (% प्रति वर्ष):</label>
+                <input type="number" id="c3_r" value="12" step="0.5" oninput="runAll()">
+            </div>
+            <div class="input-group">
+                <label>अपेक्षित महागाई दर (% Inflation):</label>
+                <input type="number" id="c3_inf" value="6" step="0.5" oninput="runAll()">
+            </div>
+            <div class="input-group">
+                <label>कालावधी (वर्षे):</label>
+                <input type="number" id="c3_n" value="20" oninput="runAll()">
+            </div>
+        </div>
+    </div>
+
+    <!-- CALC 4: Step-Up + Inflation vs Normal Comparison -->
+    <div id="calc4" class="calc-form">
+        <div class="form-grid">
+            <div class="input-group">
+                <label>प्रारंभिक मासिक SIP रक्कम (₹):</label>
+                <input type="number" id="c4_p" value="1000" oninput="runAll()">
+            </div>
+            <div class="input-group">
+                <label>Step-Up चा प्रकार:</label>
+                <div class="radio-group">
+                    <label><input type="radio" name="c4_type" value="pct" checked onchange="runAll()"> टक्केवारी (%)</label>
+                    <label><input type="radio" name="c4_type" value="amt" onchange="runAll()"> रक्कम (₹ Amount)</label>
+                </div>
+            </div>
+            <div class="input-group">
+                <label id="c4_step_label">वार्षिक Step-Up (%):</label>
+                <input type="number" id="c4_step" value="10" oninput="runAll()">
+            </div>
+            <div class="input-group">
+                <label>अपेक्षित परतावा दर (%):</label>
+                <input type="number" id="c4_r" value="12" step="0.5" oninput="runAll()">
+            </div>
+            <div class="input-group">
+                <label>अपेक्षित महागाई दर (% Inflation):</label>
+                <input type="number" id="c4_inf" value="6" step="0.5" oninput="runAll()">
+            </div>
+            <div class="input-group">
+                <label>कालावधी (वर्षे):</label>
+                <input type="number" id="c4_n" value="20" oninput="runAll()">
+            </div>
+        </div>
+    </div>
+
+    <!-- CALC 5: Goal Cost Calculator (Inflation Impact on a Goal) -->
+    <div id="calc5" class="calc-form">
+        <div class="form-grid">
+            <div class="input-group">
+                <label>ध्येयाची आजची किंमत (₹) / Goal's Current Cost:</label>
+                <input type="number" id="c5_p" value="500000" oninput="runAll()">
+            </div>
+            <div class="input-group">
+                <label>अपेक्षित महागाई दर (% Inflation):</label>
+                <input type="number" id="c5_inf" value="7" step="0.5" oninput="runAll()">
+            </div>
+            <div class="input-group">
+                <label>कालावधी (वर्षे):</label>
+                <input type="number" id="c5_n" value="15" oninput="runAll()">
+            </div>
+        </div>
+    </div>
+
+    <!-- Goal Cost Calculator Summary Cards -->
+    <div id="goalcost_cards_block" style="display: none;">
+        <div class="card-row-two">
+            <div class="yellow-card">
+                <div class="title">आजची किंमत (Current Value)</div>
+                <div class="value" id="disp_goal_current">Rs. 0</div>
+            </div>
+            <div class="yellow-card">
+                <div class="title">महागाईमुळे वाढ (Inflation Impact)</div>
+                <div class="value" id="disp_goal_increase">Rs. 0</div>
+            </div>
+        </div>
+        <div class="blue-card" style="margin-top: 10px;">
+            <div class="title">भविष्यातील किंमत (Future Cost of this Goal)</div>
+            <div class="value" id="disp_goal_future">Rs. 0</div>
+        </div>
+    </div>
+
+    <!-- Summary Cards Section -->
+    <div class="cards-container" id="normal_cards_block">
+        <!-- Normal SIP Summary Cards -->
+        <div class="card-row-two">
+            <div class="yellow-card">
+                <div class="title">Total SIP Amount Invested</div>
+                <div class="value" id="disp_norm_inv">Rs. 0</div>
+            </div>
+            <div class="yellow-card">
+                <div class="title">Total Growth</div>
+                <div class="value" id="disp_norm_gain">Rs. 0</div>
+            </div>
+        </div>
+        <div class="blue-card">
+            <div class="title">Total Future Value (Your SIP Investment Amount + Growth)</div>
+            <div class="value" id="disp_norm_fv">Rs. 0</div>
+        </div>
+
+        <!-- Step-Up Summary Cards (Visible in Tab 2 & Tab 4) -->
+        <div id="stepup_cards_block">
+            <div class="card-row-two">
+                <div class="yellow-card">
+                    <div class="title">Total SIP Amount Invested with step up</div>
+                    <div class="value" id="disp_step_inv">Rs. 0</div>
+                </div>
+                <div class="yellow-card">
+                    <div class="title">Total Growth with step up</div>
+                    <div class="value" id="disp_step_gain">Rs. 0</div>
+                </div>
+            </div>
+            <div class="blue-card" style="margin-top: 10px;">
+                <div class="title">Total Future Value (Your SIP Investment Amount + Growth) with step up</div>
+                <div class="value" id="disp_step_fv">Rs. 0</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Visual Bar Chart Section -->
+    <div class="chart-box-wrapper">
+        <div class="chart-main-area">
+            <!-- Y-Axis Ticks -->
+            <div class="y-axis">
+                <span id="y_tick_4">20L</span>
+                <span id="y_tick_3">15L</span>
+                <span id="y_tick_2">10L</span>
+                <span id="y_tick_1">5L</span>
+                <span id="y_tick_0">0</span>
+            </div>
+
+            <!-- Bars Canvas Container -->
+            <div class="bars-container">
+                <!-- Grid lines -->
+                <div class="grid-line" style="bottom: 130px;"></div>
+                <div class="grid-line" style="bottom: 97.5px;"></div>
+                <div class="grid-line" style="bottom: 65px;"></div>
+                <div class="grid-line" style="bottom: 32.5px;"></div>
+                <div class="grid-line" style="bottom: 0px;"></div>
+
+                <!-- Bar 1: Invested -->
+                <div class="bar-wrapper">
+                    <div class="bar-val-top bar-val-green" id="bar1_top_val">₹6.87L</div>
+                    <div class="bar-track">
+                        <div class="bar-body bg-green" id="bar1_shape" style="height: 34%;"></div>
+                    </div>
+                    <div class="bar-x-label" id="bar1_label_text">Invested Amount</div>
+                </div>
+
+                <!-- Bar 2: Total Value -->
+                <div class="bar-wrapper">
+                    <div class="bar-val-top bar-val-orange" id="bar2_top_val">₹19.89L</div>
+                    <div class="bar-track">
+                        <div class="bar-body bg-orange" id="bar2_shape" style="height: 100%;"></div>
+                    </div>
+                    <div class="bar-x-label" id="bar2_label_text">Total Value</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="chart-legend">
+            <div class="legend-item">
+                <span class="dot" style="background: #00bfa5;"></span>
+                <span><span id="legend_inv_label">Invested Amount</span>: <strong id="legend_inv_val">₹6.87 Lakh</strong></span>
+            </div>
+            <div class="legend-item">
+                <span class="dot" style="background: #f5a623;"></span>
+                <span><span id="legend_fv_label">Total Value (with Step-Up)</span>: <strong id="legend_fv_val">₹19.89 Lakh</strong></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Yearwise Breakdown Table -->
+    <div class="table-container" id="sip_table_container">
+        <div class="table-title">SIP Calculator Step Up Amount Invested Summary</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Year</th>
+                    <th>SIP Amount / Month</th>
+                    <th>Invested Amount / Year</th>
+                    <th>Total Invested Amount</th>
+                    <th>Total Value</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+
+    <!-- Action Button -->
+    <button class="btn-pdf" onclick="window.print()">📥 १-क्लिक मध्ये PDF डाऊनलोड / प्रिंट करा</button>
+
+    <!-- Regulatory Disclaimer -->
+    <div class="disclaimer">
+        <strong>Disclaimer:</strong>
+        <ol style="margin: 6px 0 0 18px; padding: 0;">
+            <li>Past performance may or may not be sustained in future and is not a guarantee of any future returns.</li>
+            <li>Please note that these calculators are for illustrations only and do not represent actual returns.</li>
+            <li>Mutual Funds do not have a fixed rate of return and it is not possible to predict the rate of return.</li>
+            <li>Mutual Fund Investments are subject to market risks, read all scheme related documents carefully.</li>
+        </ol>
+    </div>
+</div>
+
+<script>
+    let activeTab = 'calc1';
+
+    function fmtRs(num) {
+        return "Rs. " + Math.round(num).toLocaleString('en-IN');
+    }
+
+    function fmtLakhWords(num) {
+        if (num >= 10000000) {
+            return "₹" + (num / 10000000).toFixed(2) + " Crore";
+        }
+        return "₹" + (num / 100000).toFixed(2) + " Lakh";
+    }
+
+    function fmtLakhShort(num) {
+        if (num >= 10000000) {
+            return "₹" + (num / 10000000).toFixed(2) + "Cr";
+        }
+        return "₹" + (num / 100000).toFixed(2) + "L";
+    }
+
+    function fmtAxisValue(num) {
+        if (num >= 10000000) return (num / 10000000).toFixed(1) + "Cr";
+        if (num >= 100000) return Math.round(num / 100000) + "L";
+        if (num >= 1000) return Math.round(num / 1000) + "K";
+        return Math.round(num);
+    }
+
+    function switchTab(evt, calcId) {
+        activeTab = calcId;
+        let forms = document.getElementsByClassName("calc-form");
+        for (let f of forms) f.classList.remove("active");
+        let tabs = document.getElementsByClassName("tab-btn");
+        for (let t of tabs) t.classList.remove("active");
+        
+        document.getElementById(calcId).classList.add("active");
+        evt.currentTarget.classList.add("active");
+
+        if (calcId === 'calc5') {
+            // Goal Cost Calculator: hide SIP cards + year-wise table, show goal cards, relabel chart
+            document.getElementById('normal_cards_block').style.display = 'none';
+            document.getElementById('goalcost_cards_block').style.display = 'block';
+            document.getElementById('sip_table_container').style.display = 'none';
+            document.getElementById('bar1_label_text').innerText = 'आजची किंमत';
+            document.getElementById('bar2_label_text').innerText = 'भविष्यातील किंमत';
+            document.getElementById('legend_inv_label').innerText = 'आजची किंमत';
+            document.getElementById('legend_fv_label').innerText = 'भविष्यातील किंमत';
+        } else {
+            document.getElementById('normal_cards_block').style.display = 'flex';
+            document.getElementById('goalcost_cards_block').style.display = 'none';
+            document.getElementById('sip_table_container').style.display = 'block';
+            document.getElementById('bar1_label_text').innerText = 'Invested Amount';
+            document.getElementById('bar2_label_text').innerText = 'Total Value';
+            document.getElementById('legend_inv_label').innerText = 'Invested Amount';
+            document.getElementById('legend_fv_label').innerText = 'Total Value (with Step-Up)';
+
+            if (calcId === 'calc1' || calcId === 'calc3') {
+                document.getElementById('stepup_cards_block').style.display = 'none';
+            } else {
+                document.getElementById('stepup_cards_block').style.display = 'block';
+            }
+        }
+
+        runAll();
+    }
+
+    document.getElementById('reportDate').value = new Date().toLocaleDateString('en-IN');
+
+    function runAll() {
+        if (activeTab === 'calc1') runCalc1();
+        else if (activeTab === 'calc2') runCalc2();
+        else if (activeTab === 'calc3') runCalc3();
+        else if (activeTab === 'calc4') runCalc4();
+        else if (activeTab === 'calc5') runCalc5();
+    }
+
+    // Matches MFSH (Mutual Funds Sahi Hai / AMFI) official Step-Up SIP calculator formula
+    // exactly, validated against their published worked example (P=5000, step=10%,
+    // 10yrs, 12% return -> Invested 9,56,245 | FV 16,87,163). stepVal=0 gives the
+    // correct "Normal SIP" number too, so this single function drives every tab.
+    function calculateStepUpSIPExact(startP, years, annualRate, stepVal, isPct) {
+        let r = annualRate / 12 / 100;
+        let fv = 0;
+        let totalInv = 0;
+        let currP = startP;
+        let tableData = [];
+
+        for (let y = 1; y <= years; y++) {
+            let yearlyInv = 0;
+            for (let m = 1; m <= 12; m++) {
+                fv = (fv + currP) * (1 + r);
+                totalInv += currP;
+                yearlyInv += currP;
+            }
+
+            tableData.push({
+                year: "Year" + y,
+                monthlyP: currP,
+                yearlyInv: yearlyInv,
+                totalInv: totalInv,
+                fv: fv
+            });
+
+            if (stepVal > 0) {
+                if (isPct) {
+                    currP = currP * (1 + (stepVal / 100));
+                } else {
+                    currP = currP + stepVal;
+                }
+            }
+        }
+
+        return {
+            totalInv: totalInv,
+            fv: fv,
+            gain: fv - totalInv,
+            tableData: tableData
+        };
+    }
+
+    // CALC 1: Normal SIP
+    function runCalc1() {
+        let p = parseFloat(document.getElementById('c1_p').value) || 0;
+        let r = parseFloat(document.getElementById('c1_r').value) || 0;
+        let years = parseInt(document.getElementById('c1_n').value) || 0;
+
+        let normRes = calculateStepUpSIPExact(p, years, r, 0, false);
+
+        document.getElementById('disp_norm_inv').innerText = fmtRs(normRes.totalInv);
+        document.getElementById('disp_norm_gain').innerText = fmtRs(normRes.gain);
+        document.getElementById('disp_norm_fv').innerText = fmtRs(normRes.fv);
+
+        updateChart(normRes.totalInv, normRes.fv);
+        renderTable(normRes.tableData);
+    }
+
+    // CALC 2: Step-Up vs Normal Comparison
+    function runCalc2() {
+        let p = parseFloat(document.getElementById('c2_p').value) || 0;
+        let isPct = document.querySelector('input[name="c2_type"]:checked').value === 'pct';
+        let stepVal = parseFloat(document.getElementById('c2_step').value) || 0;
+        let r = parseFloat(document.getElementById('c2_r').value) || 0;
+        let years = parseInt(document.getElementById('c2_n').value) || 0;
+
+        document.getElementById('c2_step_label').innerText = isPct ? "वार्षिक Step-Up (%):" : "वार्षिक Step-Up रक्कम (₹):";
+
+        let normRes = calculateStepUpSIPExact(p, years, r, 0, false);
+        let stepRes = calculateStepUpSIPExact(p, years, r, stepVal, isPct);
+
+        document.getElementById('disp_norm_inv').innerText = fmtRs(normRes.totalInv);
+        document.getElementById('disp_norm_gain').innerText = fmtRs(normRes.gain);
+        document.getElementById('disp_norm_fv').innerText = fmtRs(normRes.fv);
+
+        document.getElementById('disp_step_inv').innerText = fmtRs(stepRes.totalInv);
+        document.getElementById('disp_step_gain').innerText = fmtRs(stepRes.gain);
+        document.getElementById('disp_step_fv').innerText = fmtRs(stepRes.fv);
+
+        updateChart(stepRes.totalInv, stepRes.fv);
+        renderTable(stepRes.tableData);
+    }
+
+    // CALC 3: Normal SIP + Inflation
+    function runCalc3() {
+        let p = parseFloat(document.getElementById('c3_p').value) || 0;
+        let r = parseFloat(document.getElementById('c3_r').value) || 0;
+        let inf = parseFloat(document.getElementById('c3_inf').value) || 0;
+        let years = parseInt(document.getElementById('c3_n').value) || 0;
+
+        let normRes = calculateStepUpSIPExact(p, years, r, 0, false);
+        let realVal = normRes.fv / Math.pow(1 + (inf / 100), years);
+
+        document.getElementById('disp_norm_inv').innerText = fmtRs(normRes.totalInv);
+        document.getElementById('disp_norm_gain').innerText = fmtRs(normRes.gain);
+        document.getElementById('disp_norm_fv').innerText = `${fmtRs(normRes.fv)} (आजची खरेदी क्षमता: ${fmtRs(realVal)})`;
+
+        updateChart(normRes.totalInv, normRes.fv);
+        renderTable(normRes.tableData);
+    }
+
+    // CALC 4: Step-Up + Inflation
+    function runCalc4() {
+        let p = parseFloat(document.getElementById('c4_p').value) || 0;
+        let isPct = document.querySelector('input[name="c4_type"]:checked').value === 'pct';
+        let stepVal = parseFloat(document.getElementById('c4_step').value) || 0;
+        let r = parseFloat(document.getElementById('c4_r').value) || 0;
+        let inf = parseFloat(document.getElementById('c4_inf').value) || 0;
+        let years = parseInt(document.getElementById('c4_n').value) || 0;
+
+        document.getElementById('c4_step_label').innerText = isPct ? "वार्षिक Step-Up (%):" : "वार्षिक Step-Up रक्कम (₹):";
+
+        let normRes = calculateStepUpSIPExact(p, years, r, 0, false);
+        let normReal = normRes.fv / Math.pow(1 + (inf / 100), years);
+
+        let stepRes = calculateStepUpSIPExact(p, years, r, stepVal, isPct);
+        let stepReal = stepRes.fv / Math.pow(1 + (inf / 100), years);
+
+        document.getElementById('disp_norm_inv').innerText = fmtRs(normRes.totalInv);
+        document.getElementById('disp_norm_gain').innerText = fmtRs(normRes.gain);
+        document.getElementById('disp_norm_fv').innerText = `${fmtRs(normRes.fv)} (आजची खरेदी क्षमता: ${fmtRs(normReal)})`;
+
+        document.getElementById('disp_step_inv').innerText = fmtRs(stepRes.totalInv);
+        document.getElementById('disp_step_gain').innerText = fmtRs(stepRes.gain);
+        document.getElementById('disp_step_fv').innerText = `${fmtRs(stepRes.fv)} (आजची खरेदी क्षमता: ${fmtRs(stepReal)})`;
+
+        updateChart(stepRes.totalInv, stepRes.fv);
+        renderTable(stepRes.tableData);
+    }
+
+    // CALC 5: Goal Cost Calculator (matches MFSH Inflation Calculator formula exactly)
+    function runCalc5() {
+        let p = parseFloat(document.getElementById('c5_p').value) || 0;
+        let inf = parseFloat(document.getElementById('c5_inf').value) || 0;
+        let years = parseInt(document.getElementById('c5_n').value) || 0;
+
+        let futureCost = p * Math.pow(1 + (inf / 100), years);
+        let increase = futureCost - p;
+
+        document.getElementById('disp_goal_current').innerText = fmtRs(p);
+        document.getElementById('disp_goal_increase').innerText = fmtRs(increase);
+        document.getElementById('disp_goal_future').innerText = fmtRs(futureCost);
+
+        updateChart(p, futureCost);
+    }
+
+    // Robust Bar Chart Updater
+    function updateChart(inv, fv) {
+        let maxVal = Math.max(inv, fv, 100000);
+        
+        // Y-Axis Ticks
+        document.getElementById('y_tick_4').innerText = fmtAxisValue(maxVal);
+        document.getElementById('y_tick_3').innerText = fmtAxisValue(maxVal * 0.75);
+        document.getElementById('y_tick_2').innerText = fmtAxisValue(maxVal * 0.50);
+        document.getElementById('y_tick_1').innerText = fmtAxisValue(maxVal * 0.25);
+        document.getElementById('y_tick_0').innerText = "0";
+
+        // Calculated Heights relative to 130px track height
+        let bar1Pct = Math.max((inv / maxVal) * 100, 5);
+        let bar2Pct = Math.max((fv / maxVal) * 100, 5);
+
+        document.getElementById('bar1_shape').style.height = bar1Pct + '%';
+        document.getElementById('bar2_shape').style.height = bar2Pct + '%';
+
+        // Labels
+        document.getElementById('bar1_top_val').innerText = fmtLakhWords(inv);
+        document.getElementById('bar2_top_val').innerText = fmtLakhWords(fv);
+
+        document.getElementById('legend_inv_val').innerText = fmtLakhWords(inv);
+        document.getElementById('legend_fv_val').innerText = fmtLakhWords(fv);
+    }
+
+    // Table Renderer
+    function renderTable(tableData) {
+        let tableHTML = "";
+        for (let row of tableData) {
+            tableHTML += `<tr>
+                <td>${row.year}</td>
+                <td>${Math.round(row.monthlyP).toLocaleString('en-IN')}</td>
+                <td>${Math.round(row.yearlyInv).toLocaleString('en-IN')}</td>
+                <td>${Math.round(row.totalInv).toLocaleString('en-IN')}</td>
+                <td>${Math.round(row.fv).toLocaleString('en-IN')}</td>
+            </tr>`;
+        }
+        document.getElementById('tableBody').innerHTML = tableHTML;
+    }
+
+    window.onload = function() {
+        document.getElementById('stepup_cards_block').style.display = 'none';
+        runAll();
+    };
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('Service Worker Registered'))
+          .catch(err => console.log('Service Worker Failed', err));
+      });
+    }
+</script>
+
+</body>
+</html>
