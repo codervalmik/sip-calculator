@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SIP Calculator - Valmik Dagu Ugale</title>
     <link rel="manifest" href="manifest.json">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         :root {
             --primary: #1e3a8a;
@@ -148,6 +149,8 @@
 
         /* Print Button */
         .btn-pdf { width: 100%; background: var(--secondary); color: white; border: none; padding: 12px; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        .btn-share { width: 100%; background: #075E54; color: white; border: none; padding: 13px; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        .btn-share:disabled { opacity: 0.6; cursor: wait; }
 
         /* Regulatory Disclaimer */
         .disclaimer { font-size: 10px; color: #64748b; text-align: justify; margin-top: 20px; border-top: 1px solid #e2e8f0; padding-top: 10px; line-height: 1.5; }
@@ -160,7 +163,7 @@
             }
             body { background: white; padding: 0; }
             .container { box-shadow: none; border: none; max-width: 100%; }
-            .tabs, .btn-pdf { display: none !important; }
+            .tabs, .btn-pdf, .btn-share { display: none !important; }
             .calc-form.active { display: block !important; }
             input, select { border: none !important; background: transparent !important; font-weight: bold; }
         }
@@ -459,7 +462,7 @@
     </div>
 
     <!-- Action Button -->
-    <button class="btn-pdf" onclick="window.print()">📥 १-क्लिक मध्ये PDF डाऊनलोड / प्रिंट करा</button>
+    <button class="btn-share" id="shareBtn" onclick="shareOrDownloadPDF()">📤 PDF तयार करून थेट Share करा (WhatsApp/Email)</button>
 
     <!-- Regulatory Disclaimer -->
     <div class="disclaimer">
@@ -736,6 +739,65 @@
             </tr>`;
         }
         document.getElementById('tableBody').innerHTML = tableHTML;
+    }
+
+    // One-click: generate PDF and open native mobile Share sheet (WhatsApp/Email/etc.)
+    async function shareOrDownloadPDF() {
+        let clientName = document.getElementById('clientName').value.trim() || 'Client';
+        let fileName = `SIP_Plan_${clientName}.pdf`;
+        let element = document.querySelector('.container');
+
+        let btn = document.getElementById('shareBtn');
+        let originalText = btn.innerText;
+        btn.innerText = '⏳ PDF तयार होत आहे... थांबा';
+        btn.disabled = true;
+
+        // PDF तयार करताना बटणे आणि टॅब लपवणे
+        let tabs = document.querySelector('.tabs');
+        if (tabs) tabs.style.display = 'none';
+        btn.style.display = 'none';
+
+        let opt = {
+            margin:       8,
+            filename:     fileName,
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2, useCORS: true },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        try {
+            // 1. PDF तयार करणे (outputPdf is the correct html2pdf.js Worker method for 'blob')
+            let pdfBlob = await html2pdf().set(opt).from(element).outputPdf('blob');
+
+            // 2. बटणे पूर्ववत दाखवणे
+            if (tabs) tabs.style.display = 'flex';
+            btn.style.display = 'block';
+
+            // 3. Blob फाईल तयार करणे
+            let file = new File([pdfBlob], fileName, { type: 'application/pdf' });
+
+            // 4. मोबाईलवर डायरेक्ट WhatsApp Share पर्याय उघडणे
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                await navigator.share({
+                    files: [file],
+                    title: `SIP Financial Projection - ${clientName}`,
+                    text: `नमस्कार ${clientName}, आपला SIP गुंतवणूक प्लॅनिंग रिपोर्ट सोबत पाठवत आहे.`
+                });
+            } else {
+                // लॅपटॉप किंवा इतर ब्राऊझरसाठी थेट डाऊनलोड फाईल
+                let a = document.createElement('a');
+                a.href = URL.createObjectURL(pdfBlob);
+                a.download = fileName;
+                a.click();
+            }
+        } catch (error) {
+            if (tabs) tabs.style.display = 'flex';
+            btn.style.display = 'block';
+            console.log("Sharing cancelled or error", error);
+        } finally {
+            btn.innerText = originalText;
+            btn.disabled = false;
+        }
     }
 
     window.onload = function() {
