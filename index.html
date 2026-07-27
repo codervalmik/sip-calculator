@@ -10,12 +10,6 @@
         :root {
             --primary: #1e3a8a;
             --secondary: #0d9488;
-            --yellow-bg: #fffde7;
-            --yellow-border: #fff59d;
-            --yellow-text: #e65100;
-            --blue-bg: #e1f5fe;
-            --blue-border: #b3e5fc;
-            --blue-text: #1565c0;
             --bg: #f8fafc;
             --card: #ffffff;
             --text: #0f172a;
@@ -81,12 +75,10 @@
             .input-group label { font-size: 11px; }
             /* Prevent iOS Safari auto-zoom on input focus (needs >=16px) */
             input, select { font-size: 16px !important; padding: 9px 8px; }
-            .yellow-card { padding: 12px; }
-            .yellow-card .title { font-size: 12px; }
-            .yellow-card .value { font-size: 15px; }
-            .blue-card { padding: 12px; }
-            .blue-card .title { font-size: 12px; }
-            .blue-card .value { font-size: 17px; }
+            .metric-card { padding: 12px; }
+            .metric-card .title { font-size: 12px; }
+            .metric-card .value { font-size: 15px; }
+            .card-final .value, .card-final-step .value { font-size: 17px; }
             .chart-box-wrapper { padding: 15px 10px; }
             .bars-container { padding-left: 8px; padding-right: 8px; }
             .bar-wrapper { width: 78px; }
@@ -102,13 +94,31 @@
             .disclaimer { font-size: 9px; }
         }
 
-        .yellow-card { background-color: var(--yellow-bg); border: 1px solid var(--yellow-border); border-radius: 12px; padding: 15px; text-align: center; }
-        .yellow-card .title { font-size: 13px; font-weight: 700; color: #555; margin-bottom: 6px; }
-        .yellow-card .value { font-size: 18px; font-weight: 800; color: var(--yellow-text); }
+        .metric-card { border-radius: 12px; padding: 15px; text-align: center; border: 1px solid transparent; }
+        .metric-card .title { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+        .metric-card .value { font-size: 18px; font-weight: 800; }
 
-        .blue-card { background-color: var(--blue-bg); border: 1px solid var(--blue-border); border-radius: 12px; padding: 15px; text-align: center; }
-        .blue-card .title { font-size: 13px; font-weight: 700; color: #333; margin-bottom: 6px; }
-        .blue-card .value { font-size: 20px; font-weight: 800; color: var(--blue-text); }
+        /* Normal SIP: Invested (neutral blue-grey) -> Growth (light green) -> Final (deep green) */
+        .card-invested { background-color: #eef2f7; border-color: #d5dee8; }
+        .card-invested .title { color: #475569; }
+        .card-invested .value { color: #334155; }
+        .card-growth { background-color: #e8f5e9; border-color: #c8e6c9; }
+        .card-growth .title { color: #2e7d32; }
+        .card-growth .value { color: #1b5e20; }
+        .card-final { background-color: #2e7d32; border-color: #2e7d32; }
+        .card-final .title { color: #e8f5e9; }
+        .card-final .value { color: #ffffff; font-size: 20px; }
+
+        /* Step-Up SIP: Invested (light amber) -> Growth (light teal) -> Final (deep teal) */
+        .card-invested-step { background-color: #fff3e0; border-color: #ffe0b2; }
+        .card-invested-step .title { color: #8d5a1a; }
+        .card-invested-step .value { color: #e65100; }
+        .card-growth-step { background-color: #e0f2f1; border-color: #b2dfdb; }
+        .card-growth-step .title { color: #00695c; }
+        .card-growth-step .value { color: #004d40; }
+        .card-final-step { background-color: #00695c; border-color: #00695c; }
+        .card-final-step .title { color: #e0f2f1; }
+        .card-final-step .value { color: #ffffff; font-size: 20px; }
 
         /* Fixed Image-4 Style Visual Bar Chart Box */
         .chart-box-wrapper { background: #f4f5f7; border-radius: 16px; padding: 25px 20px; margin-top: 20px; border: 1px solid #e5e7eb; }
@@ -338,16 +348,16 @@
     <!-- Goal Cost Calculator Summary Cards -->
     <div id="goalcost_cards_block" style="display: none;">
         <div class="card-row-two">
-            <div class="yellow-card">
+            <div class="metric-card card-invested">
                 <div class="title">आजची किंमत (Current Value)</div>
                 <div class="value" id="disp_goal_current">Rs. 0</div>
             </div>
-            <div class="yellow-card">
+            <div class="metric-card card-growth">
                 <div class="title">महागाईमुळे वाढ (Inflation Impact)</div>
                 <div class="value" id="disp_goal_increase">Rs. 0</div>
             </div>
         </div>
-        <div class="blue-card" style="margin-top: 10px;">
+        <div class="metric-card card-final" style="margin-top: 10px;">
             <div class="title">भविष्यातील किंमत (Future Cost of this Goal)</div>
             <div class="value" id="disp_goal_future">Rs. 0</div>
         </div>
@@ -355,35 +365,35 @@
 
     <!-- Summary Cards Section -->
     <div class="cards-container" id="normal_cards_block">
-        <!-- Normal SIP Summary Cards -->
+        <!-- Normal SIP Summary Cards: Invested (neutral) -> Growth (light green) -> Final Value (deep green) -->
         <div class="card-row-two">
-            <div class="yellow-card">
+            <div class="metric-card card-invested">
                 <div class="title">Total SIP Amount Invested</div>
                 <div class="value" id="disp_norm_inv">Rs. 0</div>
             </div>
-            <div class="yellow-card">
+            <div class="metric-card card-growth">
                 <div class="title">Total Growth</div>
                 <div class="value" id="disp_norm_gain">Rs. 0</div>
             </div>
         </div>
-        <div class="blue-card">
+        <div class="metric-card card-final">
             <div class="title">Total Future Value (Your SIP Investment Amount + Growth)</div>
             <div class="value" id="disp_norm_fv">Rs. 0</div>
         </div>
 
-        <!-- Step-Up Summary Cards (Visible in Tab 2 & Tab 4) -->
+        <!-- Step-Up Summary Cards: Invested (amber) -> Growth (light teal) -> Final Value (deep teal) -->
         <div id="stepup_cards_block">
             <div class="card-row-two">
-                <div class="yellow-card">
+                <div class="metric-card card-invested-step">
                     <div class="title">Total SIP Amount Invested with step up</div>
                     <div class="value" id="disp_step_inv">Rs. 0</div>
                 </div>
-                <div class="yellow-card">
+                <div class="metric-card card-growth-step">
                     <div class="title">Total Growth with step up</div>
                     <div class="value" id="disp_step_gain">Rs. 0</div>
                 </div>
             </div>
-            <div class="blue-card" style="margin-top: 10px;">
+            <div class="metric-card card-final-step" style="margin-top: 10px;">
                 <div class="title">Total Future Value (Your SIP Investment Amount + Growth) with step up</div>
                 <div class="value" id="disp_step_fv">Rs. 0</div>
             </div>
@@ -762,7 +772,7 @@
             margin:       8,
             filename:     fileName,
             image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2, useCORS: true, scrollX: 0, scrollY: 0, windowWidth: document.documentElement.scrollWidth },
+            html2canvas:  { scale: 2, useCORS: true, scrollX: 0, scrollY: 0, windowWidth: 1000 },
             jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
 
