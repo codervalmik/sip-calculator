@@ -223,13 +223,21 @@
         <button class="tab-btn" onclick="switchTab(event, 'calc3')">3. SIP + Inflation</button>
         <button class="tab-btn" onclick="switchTab(event, 'calc4')">4. Step-Up + Inflation</button>
         <button class="tab-btn" onclick="switchTab(event, 'calc5')">5. Goal Cost Calculator</button>
+        <button class="tab-btn" onclick="switchTab(event, 'calc6')">6. Lumpsum Calculator</button>
     </div>
 
     <!-- CALC 1: Normal SIP -->
     <div id="calc1" class="calc-form active">
         <div class="form-grid">
             <div class="input-group">
-                <label>मासिक SIP रक्कम (₹):</label>
+                <label>SIP प्रकार (Frequency):</label>
+                <div class="radio-group">
+                    <label><input type="radio" name="c1_freq" value="monthly" checked onchange="onC1FreqChange()"> मासिक (Monthly)</label>
+                    <label><input type="radio" name="c1_freq" value="yearly" onchange="onC1FreqChange()"> वार्षिक (Yearly)</label>
+                </div>
+            </div>
+            <div class="input-group">
+                <label id="c1_p_label">मासिक SIP रक्कम (₹):</label>
                 <input type="number" id="c1_p" value="1000" oninput="runAll()">
             </div>
             <div class="input-group">
@@ -345,7 +353,59 @@
         </div>
     </div>
 
-    <!-- Goal Cost Calculator Summary Cards -->
+    <!-- CALC 6: Lumpsum Calculator (matches MFSH Lumpsum formula: annual compounding) -->
+    <div id="calc6" class="calc-form">
+        <div class="form-grid">
+            <div class="input-group">
+                <label>Lumpsum गुंतवणूक रक्कम (₹):</label>
+                <input type="number" id="c6_p" value="100000" oninput="runAll()">
+            </div>
+            <div class="input-group">
+                <label>अपेक्षित परतावा दर (% प्रति वर्ष):</label>
+                <input type="number" id="c6_r" value="12" step="0.5" oninput="runAll()">
+            </div>
+            <div class="input-group">
+                <label>कालावधी (वर्षे):</label>
+                <input type="number" id="c6_n" value="10" oninput="runAll()">
+            </div>
+            <div class="input-group">
+                <label>अपेक्षित महागाई दर (% Inflation):</label>
+                <input type="number" id="c6_inf" value="6" step="0.5" oninput="runAll()">
+            </div>
+        </div>
+    </div>
+
+    <!-- Lumpsum Summary Cards -->
+    <div id="lumpsum_cards_block" style="display: none;">
+        <div class="card-row-two">
+            <div class="metric-card card-invested">
+                <div class="title">Lumpsum गुंतवलेली रक्कम</div>
+                <div class="value" id="disp_lump_inv">Rs. 0</div>
+            </div>
+            <div class="metric-card card-growth">
+                <div class="title">Total Growth</div>
+                <div class="value" id="disp_lump_gain">Rs. 0</div>
+            </div>
+        </div>
+        <div class="metric-card card-final">
+            <div class="title">Final Corpus (Future Value)</div>
+            <div class="value" id="disp_lump_fv">Rs. 0</div>
+        </div>
+    </div>
+
+    <!-- Lumpsum Year-wise Compounding Table -->
+    <div class="table-container" id="lumpsum_table_container" style="display: none;">
+        <div class="table-title">Lumpsum Year-wise Compounding Table</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Year</th>
+                    <th>Value (Year-end)</th>
+                </tr>
+            </thead>
+            <tbody id="lumpsumTableBody"></tbody>
+        </table>
+    </div>
     <div id="goalcost_cards_block" style="display: none;">
         <div class="card-row-two">
             <div class="metric-card card-invested">
@@ -461,7 +521,7 @@
             <thead>
                 <tr>
                     <th>Year</th>
-                    <th>SIP Amount / Month</th>
+                    <th id="sipAmountColHeader">SIP Amount / Month</th>
                     <th>Invested Amount / Year</th>
                     <th>Total Invested Amount</th>
                     <th>Total Value</th>
@@ -525,18 +585,31 @@
         document.getElementById(calcId).classList.add("active");
         evt.currentTarget.classList.add("active");
 
+        // Reset all result-blocks/table to hidden, then show only what this tab needs
+        document.getElementById('normal_cards_block').style.display = 'none';
+        document.getElementById('goalcost_cards_block').style.display = 'none';
+        document.getElementById('lumpsum_cards_block').style.display = 'none';
+        document.getElementById('sip_table_container').style.display = 'none';
+        document.getElementById('lumpsum_table_container').style.display = 'none';
+
         if (calcId === 'calc5') {
-            // Goal Cost Calculator: hide SIP cards + year-wise table, show goal cards, relabel chart
-            document.getElementById('normal_cards_block').style.display = 'none';
+            // Goal Cost Calculator
             document.getElementById('goalcost_cards_block').style.display = 'block';
-            document.getElementById('sip_table_container').style.display = 'none';
             document.getElementById('bar1_label_text').innerText = 'आजची किंमत';
             document.getElementById('bar2_label_text').innerText = 'भविष्यातील किंमत';
             document.getElementById('legend_inv_label').innerText = 'आजची किंमत';
             document.getElementById('legend_fv_label').innerText = 'भविष्यातील किंमत';
+        } else if (calcId === 'calc6') {
+            // Lumpsum Calculator
+            document.getElementById('lumpsum_cards_block').style.display = 'block';
+            document.getElementById('lumpsum_table_container').style.display = 'block';
+            document.getElementById('bar1_label_text').innerText = 'Lumpsum गुंतवणूक';
+            document.getElementById('bar2_label_text').innerText = 'Final Corpus';
+            document.getElementById('legend_inv_label').innerText = 'Lumpsum गुंतवणूक';
+            document.getElementById('legend_fv_label').innerText = 'Final Corpus';
         } else {
+            // calc1-4: Normal SIP / Step-Up SIP family
             document.getElementById('normal_cards_block').style.display = 'flex';
-            document.getElementById('goalcost_cards_block').style.display = 'none';
             document.getElementById('sip_table_container').style.display = 'block';
             document.getElementById('bar1_label_text').innerText = 'Invested Amount';
             document.getElementById('bar2_label_text').innerText = 'Total Value';
@@ -547,6 +620,14 @@
                 document.getElementById('stepup_cards_block').style.display = 'none';
             } else {
                 document.getElementById('stepup_cards_block').style.display = 'block';
+            }
+
+            // Reset SIP-amount column header (only calc1's Yearly toggle changes this)
+            if (calcId === 'calc1') {
+                let isYearly = document.querySelector('input[name="c1_freq"]:checked').value === 'yearly';
+                document.getElementById('sipAmountColHeader').innerText = isYearly ? 'SIP Amount / Year' : 'SIP Amount / Month';
+            } else {
+                document.getElementById('sipAmountColHeader').innerText = 'SIP Amount / Month';
             }
         }
 
@@ -561,14 +642,15 @@
         else if (activeTab === 'calc3') runCalc3();
         else if (activeTab === 'calc4') runCalc4();
         else if (activeTab === 'calc5') runCalc5();
+        else if (activeTab === 'calc6') runCalc6();
     }
 
     // Matches MFSH (Mutual Funds Sahi Hai / AMFI) official Step-Up SIP calculator formula
     // exactly, validated against their published worked example (P=5000, step=10%,
     // 10yrs, 12% return -> Invested 9,56,245 | FV 16,87,163). stepVal=0 gives the
     // correct "Normal SIP" number too, so this single function drives every tab.
-    function calculateStepUpSIPExact(startP, years, annualRate, stepVal, isPct) {
-        let r = annualRate / 12 / 100;
+    function calculateStepUpSIPExact(startP, years, annualRate, stepVal, isPct, periodsPerYear = 12) {
+        let r = annualRate / periodsPerYear / 100;
         let fv = 0;
         let totalInv = 0;
         let currP = startP;
@@ -576,7 +658,7 @@
 
         for (let y = 1; y <= years; y++) {
             let yearlyInv = 0;
-            for (let m = 1; m <= 12; m++) {
+            for (let m = 1; m <= periodsPerYear; m++) {
                 fv = (fv + currP) * (1 + r);
                 totalInv += currP;
                 yearlyInv += currP;
@@ -607,13 +689,22 @@
         };
     }
 
-    // CALC 1: Normal SIP
+    // CALC 1: Normal SIP (supports Monthly or Yearly frequency)
+    function onC1FreqChange() {
+        let isYearly = document.querySelector('input[name="c1_freq"]:checked').value === 'yearly';
+        document.getElementById('c1_p_label').innerText = isYearly ? 'वार्षिक SIP रक्कम (₹):' : 'मासिक SIP रक्कम (₹):';
+        document.getElementById('sipAmountColHeader').innerText = isYearly ? 'SIP Amount / Year' : 'SIP Amount / Month';
+        runAll();
+    }
+
     function runCalc1() {
         let p = parseFloat(document.getElementById('c1_p').value) || 0;
         let r = parseFloat(document.getElementById('c1_r').value) || 0;
         let years = parseInt(document.getElementById('c1_n').value) || 0;
+        let isYearly = document.querySelector('input[name="c1_freq"]:checked').value === 'yearly';
+        let periodsPerYear = isYearly ? 1 : 12;
 
-        let normRes = calculateStepUpSIPExact(p, years, r, 0, false);
+        let normRes = calculateStepUpSIPExact(p, years, r, 0, false, periodsPerYear);
 
         document.getElementById('disp_norm_inv').innerText = fmtRs(normRes.totalInv);
         document.getElementById('disp_norm_gain').innerText = fmtRs(normRes.gain);
@@ -709,6 +800,37 @@
         document.getElementById('disp_goal_future').innerText = fmtRs(futureCost);
 
         updateChart(p, futureCost);
+    }
+
+    // CALC 6: Lumpsum Calculator (matches MFSH Lumpsum formula exactly: FV = P(1+r)^years, annual compounding)
+    function runCalc6() {
+        let p = parseFloat(document.getElementById('c6_p').value) || 0;
+        let r = parseFloat(document.getElementById('c6_r').value) || 0;
+        let years = parseInt(document.getElementById('c6_n').value) || 0;
+        let inf = parseFloat(document.getElementById('c6_inf').value) || 0;
+
+        let fv = p * Math.pow(1 + (r / 100), years);
+        let gain = fv - p;
+        let realVal = fv / Math.pow(1 + (inf / 100), years);
+
+        document.getElementById('disp_lump_inv').innerText = fmtRs(p);
+        document.getElementById('disp_lump_gain').innerText = fmtRs(gain);
+        document.getElementById('disp_lump_fv').innerText = `${fmtRs(fv)} (आजची खरेदी क्षमता: ${fmtRs(realVal)})`;
+
+        updateChart(p, fv);
+        renderLumpsumTable(p, r, years);
+    }
+
+    function renderLumpsumTable(p, r, years) {
+        let tableHTML = "";
+        for (let y = 1; y <= years; y++) {
+            let yearEndValue = p * Math.pow(1 + (r / 100), y);
+            tableHTML += `<tr>
+                <td>Year ${y}</td>
+                <td>${Math.round(yearEndValue).toLocaleString('en-IN')}</td>
+            </tr>`;
+        }
+        document.getElementById('lumpsumTableBody').innerHTML = tableHTML;
     }
 
     // Robust Bar Chart Updater
