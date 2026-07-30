@@ -275,7 +275,7 @@
     <!-- WhatsApp CTA Banner -->
     <a href="https://wa.me/918087126804?text=mala%20sip%20sathi%20margdarshan%20have%20ahe%20tumhi%20call%20kinva%20messege%20kara"
        target="_blank" class="cta-banner">
-        💰 संपत्ती निर्मिती | 🎓 मुलांचं शिक्षण-लग्न | 🏖️ निवृत्तीनंतर उत्पन्न - मोफत मार्गदर्शनासाठी कॉल / WhatsApp करा 👉 8087126804
+        💰 संपत्ती निर्मिती | 🎓 मुलांचं शिक्षण-लग्न खर्च | 🏖️ निवृत्तीनंतर उत्पन्न - मोफत मार्गदर्शनासाठी कॉल / WhatsApp करा 👉 8087126804
     </a>
 
     <!-- Navigation Tabs -->
@@ -1059,6 +1059,7 @@
     // and content that is never cropped, regardless of screen size or zoom.
     const LOGO_DATA_URI = document.querySelector('.brand-logo').src;
     const PDF_MARGIN = 42; // pt, ~15mm
+    const WHATSAPP_URL = 'https://wa.me/918087126804?text=mala%20sip%20sathi%20margdarshan%20have%20ahe%20tumhi%20call%20kinva%20messege%20kara';
 
     // ===== Marathi/Devanagari text renderer for the PDF =====
     // jsPDF's built-in fonts only support Latin glyphs, and even with a custom
@@ -1210,13 +1211,15 @@
         y += badgeImg.height + 14;
 
         const ctaBannerImg = renderMarathiBlock(
-            [{ text: '💰 संपत्ती निर्मिती | 🎓 मुलांचं शिक्षण-लग्न | 🏖️ निवृत्तीनंतर उत्पन्न - मोफत मार्गदर्शनासाठी कॉल / WhatsApp करा 👉 8087126804', fontSize: 10.5, font: '700', color: '#ffffff', align: 'center' }],
+            [{ text: '💰 संपत्ती निर्मिती | 🎓 मुलांचं शिक्षण-लग्न खर्च | 🏖️ निवृत्तीनंतर उत्पन्न - मोफत मार्गदर्शनासाठी कॉल / WhatsApp करा 👉 8087126804', fontSize: 10.5, font: '700', color: '#ffffff', align: 'center' }],
             contentWidth - 16
         );
         doc.setFillColor(34, 197, 94);
-        doc.roundedRect(PDF_MARGIN, y, contentWidth, ctaBannerImg.height + 14, 5, 5, 'F');
+        const ctaBannerH = ctaBannerImg.height + 14;
+        doc.roundedRect(PDF_MARGIN, y, contentWidth, ctaBannerH, 5, 5, 'F');
         doc.addImage(ctaBannerImg.dataUrl, 'PNG', PDF_MARGIN + 8, y + 7, ctaBannerImg.width, ctaBannerImg.height);
-        y += ctaBannerImg.height + 14 + 16;
+        doc.link(PDF_MARGIN, y, contentWidth, ctaBannerH, { url: WHATSAPP_URL });
+        y += ctaBannerH + 16;
 
         if (s) {
             const titleImg = renderMarathiBlock(
@@ -1247,14 +1250,20 @@
             [s.tab === 'calc5' ? 'Inflation Rate' : 'Expected Return', s.annualRate + '%'],
             [s.tab === 'calc5' ? "Goal's Current Cost" : (s.tab === 'calc6' ? 'Lumpsum Amount' : 'SIP Amount' + unitWord), fmtRs(s.baseAmount)]
         ];
+        if (s.stepVal && s.stepVal > 0) {
+            rows.push([
+                'Step-Up Type / Value',
+                (s.isStepPct ? 'Percentage (%) - ' + s.stepVal + '%' : 'Amount (Rs.) - ' + fmtRs(s.stepVal))
+            ]);
+        }
         doc.setFontSize(10);
         rows.forEach(function (row) {
             doc.setFont('helvetica', 'normal');
             doc.text(row[0], PDF_MARGIN, y);
             doc.text(row[1], pageWidth - PDF_MARGIN, y, { align: 'right' });
-            y += 18;
             doc.setDrawColor(230, 230, 230);
-            doc.line(PDF_MARGIN, y - 6, pageWidth - PDF_MARGIN, y - 6);
+            doc.line(PDF_MARGIN, y + 9, pageWidth - PDF_MARGIN, y + 9);
+            y += 24;
         });
 
         y += 10;
@@ -1327,57 +1336,63 @@
         const chartLabel = s.stepFv !== null ? 'Total Value (with Step-Up)' : 'Total Value';
         const chartHeight = drawResultChart(doc, PDF_MARGIN, y, contentWidth, chartInv, chartFv, chartLabel);
         y += chartHeight + 14;
+        // --- Page 1 ends here: inputs + result summary + chart ---
 
-        // Cost-of-delay urgency box, reusing the same figures shown on screen
+        // Page 2: SIP Calculator Step Up Amount Invested Summary (year-wise table)
+        addYearwiseTableToPDF(doc, s, pageWidth, contentWidth);
+
+        // Page 3: Cost-of-delay urgency banner, reusing the same figures shown on screen
         const delayLine1 = document.getElementById('delayLine1').innerText;
         const delayLine2 = document.getElementById('delayLine2').innerText;
         if (delayLine1) {
-            y += 16;
+            doc.addPage();
             const delayImg = renderMarathiBlock([
-                { text: '⏳ १ वर्ष उशीर केल्यास काय फरक पडतो?', fontSize: 11.5, font: '800', color: '#92400e' },
-                { text: delayLine1, fontSize: 10, font: 'normal', color: '#78350f', marginTop: 6 },
-                { text: delayLine2, fontSize: 10, font: 'normal', color: '#78350f', marginTop: 3 },
-                { text: 'योग्य वेळी योग्य पाऊल उचलण्यासाठी — आजच कॉल किंवा WhatsApp करून मार्गदर्शन घ्या. 📞 8087126804', fontSize: 10, font: '700', color: '#92400e', marginTop: 8 }
-            ], contentWidth - 16);
-            ensureSpace(delayImg.height + 20);
+                { text: '⏳ १ वर्ष उशीर केल्यास काय फरक पडतो?', fontSize: 13, font: '800', color: '#92400e', align: 'center' },
+                { text: delayLine1, fontSize: 11, font: 'normal', color: '#78350f', align: 'center', marginTop: 8 },
+                { text: delayLine2, fontSize: 11, font: 'normal', color: '#78350f', align: 'center', marginTop: 4 },
+                { text: 'योग्य वेळी योग्य पाऊल उचलण्यासाठी — आजच कॉल किंवा WhatsApp करून मार्गदर्शन घ्या. 📞 8087126804', fontSize: 11, font: '700', color: '#92400e', align: 'center', marginTop: 10 }
+            ], contentWidth - 32);
+            const delayBoxH = delayImg.height + 34;
+            const delayBoxY = pageHeight - PDF_MARGIN - delayBoxH; // keep the banner at the very bottom of the page
             doc.setFillColor(255, 251, 235);
             doc.setDrawColor(245, 158, 11);
-            doc.roundedRect(PDF_MARGIN - 4, y - 12, contentWidth + 8, delayImg.height + 20, 4, 4, 'FD');
-            doc.addImage(delayImg.dataUrl, 'PNG', PDF_MARGIN, y, delayImg.width, delayImg.height);
-            y += delayImg.height + 20;
+            doc.roundedRect(PDF_MARGIN, delayBoxY, contentWidth, delayBoxH, 6, 6, 'FD');
+            doc.addImage(delayImg.dataUrl, 'PNG', PDF_MARGIN + (contentWidth - delayImg.width) / 2, delayBoxY + 17, delayImg.width, delayImg.height);
+            doc.link(PDF_MARGIN, delayBoxY, contentWidth, delayBoxH, { url: WHATSAPP_URL });
         }
 
-        // Post-report guidance box (previously missing from the PDF entirely)
-        y += 6;
+        // Page 4: CTA / guidance banner - "how to actually implement this plan" call to action
+        doc.addPage();
         const guidanceImg = renderMarathiBlock([
-            { text: 'कॅल्क्युलेटरने तुम्हाला फक्त आवश्यक आकडेवारी दाखवली आहे. पण हा प्लॅन प्रत्यक्षात कसा राबवायचा, योग्य म्युच्युअल फंड योजना कशा निवडायच्या आणि पोर्टफोलिओचं स्ट्रक्चर कसे असावे?', fontSize: 10, font: 'normal', color: '#065f46', align: 'center' },
-            { text: 'हे सविस्तर समजून घेण्यासाठी व तुमच्या सर्व शंकांचे निरसन करण्यासाठी आजच मोफत:', fontSize: 10, font: 'normal', color: '#065f46', align: 'center', marginTop: 4 },
-            { text: '💬 WhatsApp मेसेज करा  |  📞 कॉल करा: 8087126804', fontSize: 10.5, font: '800', color: '#047857', align: 'center', marginTop: 6 }
-        ], contentWidth - 16);
-        ensureSpace(guidanceImg.height + 20);
+            { text: 'कॅल्क्युलेटरने तुम्हाला फक्त आवश्यक आकडेवारी दाखवली आहे. पण हा प्लॅन प्रत्यक्षात कसा राबवायचा, योग्य म्युच्युअल फंड योजना कशा निवडायच्या आणि पोर्टफोलिओचं स्ट्रक्चर कसे असावे?', fontSize: 11, font: 'normal', color: '#065f46', align: 'center' },
+            { text: 'हे सविस्तर समजून घेण्यासाठी व तुमच्या सर्व शंकांचे निरसन करण्यासाठी आजच मोफत:', fontSize: 11, font: 'normal', color: '#065f46', align: 'center', marginTop: 6 },
+            { text: '💬 WhatsApp मेसेज करा  |  📞 कॉल करा: 8087126804', fontSize: 12, font: '800', color: '#047857', align: 'center', marginTop: 10 }
+        ], contentWidth - 32);
+        const guidanceBoxH = guidanceImg.height + 34;
+        const guidanceBoxY = (pageHeight - guidanceBoxH) / 2; // centered on its own page
         doc.setFillColor(236, 253, 245);
         doc.setDrawColor(167, 243, 208);
-        doc.roundedRect(PDF_MARGIN - 4, y - 12, contentWidth + 8, guidanceImg.height + 20, 4, 4, 'FD');
-        doc.addImage(guidanceImg.dataUrl, 'PNG', PDF_MARGIN, y, guidanceImg.width, guidanceImg.height);
-        y += guidanceImg.height + 20;
+        doc.roundedRect(PDF_MARGIN, guidanceBoxY, contentWidth, guidanceBoxH, 6, 6, 'FD');
+        doc.addImage(guidanceImg.dataUrl, 'PNG', PDF_MARGIN + (contentWidth - guidanceImg.width) / 2, guidanceBoxY + 17, guidanceImg.width, guidanceImg.height);
+        doc.link(PDF_MARGIN, guidanceBoxY, contentWidth, guidanceBoxH, { url: WHATSAPP_URL });
 
-        y += 12;
-        ensureSpace(70);
-        doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor(60, 60, 60);
+        // Page 5: Disclaimer
+        doc.addPage();
+        y = 60;
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.setTextColor(60, 60, 60);
         doc.text('Disclaimer', PDF_MARGIN, y);
-        y += 13;
-        doc.setFont('helvetica', 'normal'); doc.setFontSize(8);
+        y += 20;
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5);
         [
             '1. Past performance may or may not be sustained in future and is not a guarantee of any future returns.',
             '2. Please note that these calculators are for illustrations only and do not represent actual returns.',
             '3. Mutual Funds do not have a fixed rate of return and it is not possible to predict the rate of return.',
             '4. Mutual Fund Investments are subject to market risks, read all scheme related documents carefully.'
         ].forEach(function (line) {
-            doc.text(doc.splitTextToSize(line, contentWidth), PDF_MARGIN, y);
-            y += 12;
+            const wrapped = doc.splitTextToSize(line, contentWidth);
+            doc.text(wrapped, PDF_MARGIN, y);
+            y += wrapped.length * 14 + 6;
         });
-
-        addYearwiseTableToPDF(doc, s, pageWidth, contentWidth);
 
         return doc;
     }
