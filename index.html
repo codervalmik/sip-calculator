@@ -1110,6 +1110,8 @@
                 let x = 0;
                 if (seg.align === 'center') {
                     x = Math.max(0, (maxWidthPx - ctx.measureText(line).width) / 2);
+                } else if (seg.align === 'right') {
+                    x = Math.max(0, maxWidthPx - ctx.measureText(line).width);
                 }
                 ctx.fillText(line, x, y);
                 y += seg.lineHeight;
@@ -1145,7 +1147,7 @@
             doc.setDrawColor(230, 230, 230);
             doc.line(axisX, ty, x + w, ty);
             doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(107, 114, 128);
-            doc.text('₹' + Math.round((maxVal * f) / 100000) + 'L', axisX - 4, ty + 2, { align: 'right' });
+            doc.text(Math.round((maxVal * f) / 100000) + 'L', axisX - 4, ty + 2, { align: 'right' });
         });
 
         const bars = [
@@ -1160,7 +1162,7 @@
             doc.setFillColor(bar.color[0], bar.color[1], bar.color[2]);
             doc.rect(bx, baseY - barH, barW, barH, 'F');
             doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor(bar.color[0], bar.color[1], bar.color[2]);
-            doc.text('₹' + (bar.val / 100000).toFixed(2) + 'L', bx + barW / 2, baseY - barH - 6, { align: 'center' });
+            doc.text((bar.val / 100000).toFixed(2) + 'L', bx + barW / 2, baseY - barH - 6, { align: 'center' });
             doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(60, 60, 60);
             doc.text(doc.splitTextToSize(bar.label, slot - 4), bx + barW / 2, baseY + 14, { align: 'center' });
         });
@@ -1189,9 +1191,14 @@
         doc.text('Valmik Dagu Ugale | ARN-142382', PDF_MARGIN + 50, y - 6);
         doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor(90, 90, 90);
         doc.text('AMFI-registered mutual fund distributor & SIF distributor', PDF_MARGIN + 50, y + 8);
-        doc.setFontSize(9.5);
-        doc.text('8087126804 | valmikugale@gmail.com', pageWidth - PDF_MARGIN, y - 6, { align: 'right' });
-        doc.text('Nashik, Maharashtra - 422003', pageWidth - PDF_MARGIN, y + 8, { align: 'right' });
+
+        // Right-side contact block, Marathi-labelled to match the on-screen header exactly
+        const contactImg = renderMarathiBlock([
+            { text: 'संपर्क: 8087126804', fontSize: 9.5, font: '600', color: '#334155', align: 'right' },
+            { text: 'ईमेल: valmikugale@gmail.com', fontSize: 9.5, font: '600', color: '#334155', align: 'right', marginTop: 2 },
+            { text: 'नाशिक, महाराष्ट्र - 422003', fontSize: 9.5, font: 'normal', color: '#334155', align: 'right', marginTop: 2 }
+        ], 200);
+        doc.addImage(contactImg.dataUrl, 'PNG', pageWidth - PDF_MARGIN - contactImg.width, y - 15, contactImg.width, contactImg.height);
 
         const taglineImg = renderMarathiBlock(
             [{ text: 'तुमच्या आर्थिक भविष्याचा विश्वासू जोडीदार', fontSize: 12.5, font: 'italic 600', color: '#0f766e' }],
