@@ -152,6 +152,8 @@
         
         /* Y-Axis Styling */
         .y-axis { display: flex; flex-direction: column; justify-content: space-between; width: 45px; font-size: 11px; color: #6b7280; font-weight: 600; text-align: right; padding-right: 8px; border-right: 2px solid #cbd5e1; height: 140px; margin-top: 22px; }
+        /* Numeric-only chart labels: force a font whose Rupee (₹) glyph renders correctly, since the embedded Noto Sans Devanagari copy mis-renders it as a stray superscript "1" */
+        .y-axis, .bar-val-top, #legend_inv_val, #legend_fv_val { font-family: 'Segoe UI', Arial, Helvetica, sans-serif; }
         
         /* Chart Canvas Area */
         .bars-container { flex: 1; display: flex; justify-content: space-around; align-items: flex-end; position: relative; padding-left: 20px; padding-right: 20px; height: 180px; }
