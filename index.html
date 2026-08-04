@@ -48,14 +48,14 @@
         .client-bar { display: flex; gap: 15px; background: #f1f5f9; padding: 10px 15px; border-radius: 8px; margin-bottom: 20px; }
         .client-bar .field { flex: 1; }
         .client-bar label { font-size: 12px; font-weight: bold; color: #475569; display: block; margin-bottom: 4px; }
-        .client-bar input { width: 100%; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 13px; font-weight: 600; }
+        .client-bar input { width: 100%; padding: 9px 10px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 16px; font-weight: 600; }
 
         /* WhatsApp CTA Banner */
         .cta-banner { display: flex; align-items: center; justify-content: center; gap: 8px; background: #25D366; color: white; text-decoration: none; padding: 12px 15px; border-radius: 8px; margin-bottom: 20px; font-size: 13px; font-weight: 700; text-align: center; box-shadow: 0 2px 6px rgba(37,211,102,0.35); }
         .cta-banner:hover { background: #1ebe5b; }
 
         /* Navigation Tabs */
-        .tabs { display: flex; gap: 6px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
+        .tabs { display: flex; gap: 6px; margin-bottom: 20px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: thin; padding-bottom: 5px; }
         .tab-btn { flex: 1; min-width: 140px; padding: 10px; border: none; background: #e2e8f0; color: #334155; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; text-align: center; }
         .tab-btn.active { background: var(--primary); color: white; }
 
@@ -67,10 +67,12 @@
         
         .input-group { margin-bottom: 10px; }
         .input-group label { font-size: 12px; font-weight: bold; color: #334155; display: block; margin-bottom: 4px; }
-        .input-group input, .input-group select { width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; }
+        /* font-size held at 16px (not 13px) so mobile Safari/Chrome don't auto-zoom the page on focus */
+        .input-group input, .input-group select { width: 100%; padding: 10px 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 16px; }
         
-        .radio-group { display: flex; gap: 15px; margin-top: 5px; font-size: 12px; font-weight: bold; }
-        .radio-group label { display: flex; align-items: center; gap: 4px; cursor: pointer; }
+        .radio-group { display: flex; gap: 15px; margin-top: 6px; font-size: 12px; font-weight: bold; }
+        .radio-group label { display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 4px 0; min-height: 24px; }
+        .radio-group input[type="radio"] { width: 17px; height: 17px; accent-color: var(--primary); flex-shrink: 0; }
 
         /* Summary Cards Section */
         .cards-container { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
@@ -89,10 +91,8 @@
             .client-bar .field { max-width: 100% !important; }
             .cta-banner { font-size: 12px; padding: 10px 12px; line-height: 1.4; }
             .tabs { gap: 4px; }
-            .tab-btn { min-width: 108px; font-size: 10.5px; padding: 8px 5px; }
+            .tab-btn { min-width: 108px; font-size: 10.5px; padding: 11px 5px; }
             .input-group label { font-size: 11px; }
-            /* Prevent iOS Safari auto-zoom on input focus (needs >=16px) */
-            input, select { font-size: 16px !important; padding: 9px 8px; }
             .metric-card { padding: 12px; }
             .metric-card .title { font-size: 12px; }
             .metric-card .value { font-size: 15px; }
@@ -108,7 +108,8 @@
             .table-title { font-size: 12px; }
             table { font-size: 10.5px; }
             th, td { padding: 6px 6px; }
-            .btn-pdf { font-size: 13px; padding: 11px; }
+            .btn-pdf { font-size: 13px; padding: 13px 11px; }
+            .btn-pdf, .btn-share, .btn-email { min-height: 46px; }
             .disclaimer { font-size: 9px; }
             .brand-tagline { font-size: 10.5px; }
             .brand-badge { font-size: 10.5px; padding: 6px 8px; gap: 5px; }
@@ -175,7 +176,7 @@
         .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
 
         /* Yearwise Breakdown Table */
-        .table-container { margin-top: 25px; overflow-x: auto; }
+        .table-container { margin-top: 25px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
         .table-title { font-size: 14px; font-weight: bold; color: #334155; margin-bottom: 10px; }
         table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: right; }
         th, td { padding: 9px 12px; border-bottom: 1px solid #eee; }
